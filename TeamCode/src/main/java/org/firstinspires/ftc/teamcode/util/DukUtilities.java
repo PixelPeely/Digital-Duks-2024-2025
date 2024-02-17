@@ -13,9 +13,12 @@ public class DukUtilities {
     }
 
     public static float differenceConstrained(float a, float b) {
-        float distance = Math.abs(b - a);
-        float inverse_distance = 2 * (float)Math.PI - Math.abs(b) - Math.abs(a);
-        return Math.min(distance, inverse_distance) == distance ? b - a : a < b ? -inverse_distance : inverse_distance;
+        float distance = constrainAxis(b-a);
+        float inverse_distance = constrainAxis(a-b);
+        return -(Math.abs(distance) < Math.abs(inverse_distance) ? distance : inverse_distance);
+//        float distance = Math.abs(b - a);
+//        float inverse_distance = 2 * (float)Math.PI - Math.abs(b) - Math.abs(a);
+//        return Math.min(distance, inverse_distance) == distance ? b - a : (a < b ? -inverse_distance : inverse_distance);
     }
 
     public static double clamp(double value, double max, double min) {

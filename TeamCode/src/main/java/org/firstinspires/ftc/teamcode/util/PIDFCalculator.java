@@ -37,6 +37,10 @@ public class PIDFCalculator {
         lastState = currentState;
         error = (float)DukUtilities.clamp(error + difference, I_MAX, -I_MAX);
 
+        if (P > 1 && P < 1.2) {
+            System.out.println("Difference " + difference + ", err " + d);
+        }
+
         return p + i + d + f;
     }
 }

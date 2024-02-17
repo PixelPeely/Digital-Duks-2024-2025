@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.util.autonomous;
 
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
-import org.firstinspires.ftc.teamcode.util.DashboardInterface;
-import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
-import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 
@@ -59,6 +55,8 @@ public class AutonTaskExecuter {
     }
 
     public void terminate() {
+        DukHardwareMap.instance.driveTrain.applyMagnitude(0);
+        DukHardwareMap.instance.driveTrain.dispatchAllCaches();
         PersistentData.available = true;
         PersistentData.positionX = DukHardwareMap.instance.odometerWheels.positionX;
         PersistentData.positionY = DukHardwareMap.instance.odometerWheels.positionY;

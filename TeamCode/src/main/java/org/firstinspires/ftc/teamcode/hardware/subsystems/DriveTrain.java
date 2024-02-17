@@ -101,6 +101,7 @@ public class DriveTrain implements CachedSubsystem {
 
     public void turnTowardsDirectionAbsolute(float chassisOrientation, float direction) {
         DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.target = direction;
+        System.out.println("ChassisOrientation " + chassisOrientation + ", Direciton " + direction);
         turnTowardsDirectionRelative(DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(chassisOrientation));
         lastRequestedTurnDirection = direction;
     }
