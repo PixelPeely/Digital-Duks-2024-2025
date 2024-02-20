@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.util;
 
+//This is a generalized version of the Digital Duks Odometry System
 public class WheelOdometry {
     //How many ticks are measured by the odometers for a full revolution of the robot
     //(distance between parallel odometers) * (encoder ticks per revolution; 8192) / (diameter of odometer wheel)

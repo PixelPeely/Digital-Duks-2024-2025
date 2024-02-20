@@ -8,10 +8,13 @@ import org.firstinspires.ftc.teamcode.util.AssessedDiagnostics;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
+import org.firstinspires.ftc.teamcode.util.autonomous.AutonClawTask;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonConditionalPointTask;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonIntakeTask;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonPointTask;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonTaskExecuter;
+import org.firstinspires.ftc.teamcode.util.autonomous.AutonWaitTask;
+import org.firstinspires.ftc.teamcode.util.autonomous.AutonWristTask;
 
 @Autonomous(preselectTeleOp="DirectionlessDrive")
 public class BlueRightSpike extends OpMode {
@@ -44,22 +47,23 @@ public class BlueRightSpike extends OpMode {
         })); //Defaults to 3 if no spike detected
         autonTaskExecuter.tasks.add(new AutonIntakeTask(true, 1.2f));
         autonTaskExecuter.tasks.add(new AutonPointTask(-75100, 45600, (float)Math.toRadians(0), 0, 0));
-        autonTaskExecuter.tasks.add(new AutonPointTask(-75100, 15000, (float)Math.toRadians(-90), 0, 0));
-//        autonTaskExecuter.tasks.add(new AutonPointTask(-65100, 15000, (float)Math.toRadians(-90), 0, 0));
-//        autonTaskExecuter.tasks.add(new AutonPointTask(50000, 15000, (float)Math.toRadians(-90), 0, 0));
-//        autonTaskExecuter.tasks.add(new AutonPointTask(57000, 51000, (float)Math.toRadians(-90), 0, 0));
-//        autonTaskExecuter.tasks.add(new AutonWristTask(true));
-//        autonTaskExecuter.tasks.add(new AutonConditionalPointTask(() -> {
-//            switch (hMap.dukEye.spikeIndex) {
-//                case 1:
-//                    return new AutonPointTask(67000, 57000, (float)Math.toRadians(-90), 0, 0);
-//                case 2:
-//                    return new AutonPointTask(67000, 51000, (float)Math.toRadians(-90), 0, 0);
-//            }
-//            return new AutonPointTask(67000, 38500, (float)Math.toRadians(-90), 0, 0);
-//        }));
-//        autonTaskExecuter.tasks.add(new AutonClawTask(2));
-//        autonTaskExecuter.tasks.add(new AutonWristTask(false));
+        autonTaskExecuter.tasks.add(new AutonPointTask(-75100, 12000, (float)Math.toRadians(-90), 0, 0));
+        autonTaskExecuter.tasks.add(new AutonPointTask(-65100, 12000, (float)Math.toRadians(-90), 0, 0));
+        autonTaskExecuter.tasks.add(new AutonWaitTask(15));
+        autonTaskExecuter.tasks.add(new AutonPointTask(45000, 1000, (float)Math.toRadians(-90), 0, 0));
+        autonTaskExecuter.tasks.add(new AutonPointTask(45000, 51000, (float)Math.toRadians(-90), 0, 0));
+        autonTaskExecuter.tasks.add(new AutonWristTask(true));
+        autonTaskExecuter.tasks.add(new AutonConditionalPointTask(() -> {
+            switch (hMap.dukEye.spikeIndex) {
+                case 1:
+                    return new AutonPointTask(67000, 57000, (float)Math.toRadians(-90), 0, 0);
+                case 2:
+                    return new AutonPointTask(67000, 51000, (float)Math.toRadians(-90), 0, 0);
+            }
+            return new AutonPointTask(67000, 38500, (float)Math.toRadians(-90), 0, 0);
+        }));
+        autonTaskExecuter.tasks.add(new AutonClawTask(2));
+        autonTaskExecuter.tasks.add(new AutonWristTask(false));
 //        autonTaskExecuter.tasks.add(new AutonPointTask(60000, 48100, (float)Math.toRadians(-90), 0, 0));
 //        autonTaskExecuter.tasks.add(new AutonPointTask(60000, 81000, (float)Math.toRadians(-90), 0, 0));
 //        autonTaskExecuter.tasks.add(new AutonPointTask(80000, 81000, (float)Math.toRadians(-90), 0, 0));

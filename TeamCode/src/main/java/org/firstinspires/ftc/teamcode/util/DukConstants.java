@@ -26,6 +26,7 @@ public class DukConstants {
         public static final int HANGER_INCREMENT = 100;
         public static final float CLAW_INTAKE_SPEED = 1f;
         public static float CLAW_INTAKE_DROP_TIME = 0.7f;
+        public static float HANGER_AIRPLANE_POSITION = -1125;
     }
 
     public static final class ORIENTATION {
@@ -129,7 +130,7 @@ public class DukConstants {
             put(ObservedFieldObject.Type.YELLOW_PIXEL, new Scalar[]{new Scalar(0, 130, 50, Imgproc.COLOR_RGB2YCrCb), new Scalar(255, 180, 120)});
             put(ObservedFieldObject.Type.GREEN_PIXEL, new Scalar[]{new Scalar(30, 50, 0, Imgproc.COLOR_RGB2HSV), new Scalar(70, 255, 255)});
             put(ObservedFieldObject.Type.PURPLE_PIXEL, new Scalar[]{new Scalar(0, 40, 160, Imgproc.COLOR_RGB2HSV), new Scalar(255, 100, 255)});
-            put(ObservedFieldObject.Type.TEAM_PROP_RED, new Scalar[]{new Scalar(0, 0, 108, Imgproc.COLOR_RGB2YCrCb), new Scalar(255, 255, 120)});
+            put(ObservedFieldObject.Type.TEAM_PROP_RED, new Scalar[]{new Scalar(0, 0, 100, Imgproc.COLOR_RGB2YCrCb), new Scalar(255, 255, 108)});
             put(ObservedFieldObject.Type.TEAM_PROP_BLUE, new Scalar[]{new Scalar(0, 0, 150, Imgproc.COLOR_RGB2YCrCb), new Scalar(255, 100, 160)});
         }};
         public static final float HEIGHT = 88.7f;

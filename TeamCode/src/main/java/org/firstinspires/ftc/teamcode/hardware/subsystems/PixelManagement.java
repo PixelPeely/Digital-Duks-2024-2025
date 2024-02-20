@@ -7,18 +7,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
-import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_CRServo;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_Servo;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
-import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
-import org.firstinspires.ftc.teamcode.util.WheelOdometry;
-
-import java.sql.Time;
 
 public class PixelManagement implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(PixelManagement.class.getSimpleName());
@@ -56,7 +51,7 @@ public class PixelManagement implements CachedSubsystem {
         //DukConstants.AUTOMATED_CONTROLLER_PARAMS.WRIST_PF.FDividend = DukConstants.AUTOMATED_CONTROLLER_PARAMS.WRIST_FULL_ROTATION / (float)(wristPivot.getScaleRange()[0] - wristPivot.getScaleRange()[1]);
         clawPivot.setScaleRange(0.33, 0.85);
         clawIntake.setDirection(DcMotorSimple.Direction.REVERSE);
-        airplaneLatch.setScaleRange(0, 1);
+        airplaneLatch.setScaleRange(1, 0.9);
 
         dispatchAllCaches();
 
@@ -145,8 +140,8 @@ public class PixelManagement implements CachedSubsystem {
     }
 
     public void launchAirplane() {
-        airplaneLatch.setPosition(0);
-        TimeManager.scheduleFutureTask(0.5f, t -> airplaneLatch.setPosition(1));
+        airplaneLatch.setPosition(1);
+//        TimeManager.scheduleFutureTask(0.5f, t -> airplaneLatch.setPosition(1));
     }
 
     @Override

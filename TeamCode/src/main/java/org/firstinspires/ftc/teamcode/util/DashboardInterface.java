@@ -82,8 +82,8 @@ public class DashboardInterface {
                 hanger.hangerMotorR.allowDispatch(hangerMotorR);
             }
 
-            public static boolean hangerMotorL;
-            public static boolean hangerMotorR;
+            public static boolean hangerMotorL = true;
+            public static boolean hangerMotorR = true ;
         }
     }
 

@@ -1,9 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.util;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.BNO055IMUNew;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -11,8 +8,6 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.util.AssessedDiagnostics;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
-import org.firstinspires.ftc.teamcode.util.DukConstants;
-import org.firstinspires.ftc.teamcode.util.ObservedFieldObject;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
@@ -52,10 +47,8 @@ public class test extends OpMode {
         TimeManager.onCycle(time);
         DashboardInterface.tick(hMap);
 
-        hMap.pixelManagement.intakeRoller.setPower(speed);
-        hMap.pixelManagement.clawIntake.setPower(liftSpeed);
-        hMap.pixelManagement.intakeRoller.dispatchCache();
-        hMap.pixelManagement.clawIntake.dispatchCache();
+        hMap.pixelManagement.airplaneLatch.setPosition(speed);
+        hMap.pixelManagement.airplaneLatch.dispatchCache();
 
         DashboardInterface.dispatchBufferPacket();
     }

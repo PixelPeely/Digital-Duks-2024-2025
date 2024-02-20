@@ -1,13 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 //C:\Users\jerem\AppData\Local\Android\Sdk\platform-tools
 //adb connect 192.168.43.1:5555
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.PixelManagement;
-import org.firstinspires.ftc.teamcode.util.BetterGamepad;
 import org.firstinspires.ftc.teamcode.util.AssessedDiagnostics;
+import org.firstinspires.ftc.teamcode.util.BetterGamepad;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
@@ -106,6 +106,7 @@ public class DirectionlessDrive extends OpMode {
 
         //Airplane
         if (bGamepad2.onBackPressed()) hMap.pixelManagement.launchAirplane();
+        if (gamepad2.left_stick_button) hMap.hanger.setTarget(DukConstants.INPUT.HANGER_AIRPLANE_POSITION);
     }
 
     private void controlMechanismBlind() {

@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class BetterGamepad {
     private final Gamepad gamepad;
-    private boolean aPressed, bPressed, xPressed, yPressed, backPressed;
+    private boolean aPressed, bPressed, xPressed, yPressed, backPressed, leftStickPressed;
 
     public BetterGamepad(Gamepad _gamepad) {
         gamepad = _gamepad;
@@ -37,6 +37,12 @@ public class BetterGamepad {
     public boolean onBackPressed() {
         boolean newPress = gamepad.back && !backPressed;
         backPressed = gamepad.back;
+        return newPress;
+    }
+
+    public boolean onLeftStickPress() {
+        boolean newPress = gamepad.left_stick_button && !leftStickPressed;
+        leftStickPressed = gamepad.left_stick_button;
         return newPress;
     }
 }
