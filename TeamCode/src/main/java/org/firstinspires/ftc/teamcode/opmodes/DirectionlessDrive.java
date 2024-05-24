@@ -77,6 +77,60 @@ public class DirectionlessDrive extends OpMode {
             + (gamepad1.right_bumper ? 1 : gamepad1.left_bumper ? -1 : 0));
     }
 
+    private void controlMechanism() {
+        //Intake
+        if (bGamepad2.onXPressed())
+            hMap.pixelManagement.toggleIntake(false);
+        hMap.pixelManagement.setIntakeDirection(gamepad2.b);
+
+        //Lift
+        if (gamepad2.dpad_down) hMap.pixelManagement.setLiftTarget(DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_MIN);
+        else if (gamepad2.dpad_right) hMap.pixelManagement.setLiftTarget(DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PRESET_1);
+        else if (gamepad2.dpad_left) hMap.pixelManagement.setLiftTarget(DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PRESET_2);
+        else if (gamepad2.dpad_up) hMap.pixelManagement.setLiftTarget(DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PRESET_3);
+        else hMap.pixelManagement.setLiftTarget(hMap.pixelManagement.getLiftTarget() + (gamepad2.right_trigger - gamepad2.left_trigger) * DukConstants.INPUT.LIFT_INCREMENT);
+        hMap.pixelManagement.approachLiftTarget(hMap.hanger);
+
+        //Claw
+        if (bGamepad2.onYPressed())
+            hMap.pixelManagement.setClawState(!hMap.pixelManagement.wristDepositing);
+        hMap.pixelManagement.approachClawState();
+        if (bGamepad2.onAPressed() && hMap.pixelManagement.wristDepositing)
+            hMap.pixelManagement.dropPixel();
+
+        //Hanger
+        if (gamepad2.left_bumper || gamepad2.right_bumper)
+            hMap.hanger.setTarget(hMap.hanger.getAveragePosition() + DukConstants.INPUT.HANGER_INCREMENT *
+            (gamepad2.right_bumper ? 1 : gamepad2.left_bumper ? -1 : 0));
+        hMap.hanger.approachTarget();
+
+        //Airplane
+        if (bGamepad2.onBackPressed()) hMap.pixelManagement.launchAirplane();
+        if (gamepad2.left_stick_button) hMap.hanger.setTarget(DukConstants.INPUT.HANGER_AIRPLANE_POSITION);
+    }
+
+    private void controlMechanismBlind() {
+        //Intake
+        if (bGamepad2.onXPressed())
+            hMap.pixelManagement.toggleIntake(gamepad2.b);
+
+        //Lift
+        hMap.pixelManagement.lift.setPower(gamepad2.right_trigger - gamepad2.left_trigger);
+
+        //Claw
+        if (bGamepad2.onYPressed())
+            hMap.pixelManagement.setClawState(!hMap.pixelManagement.wristDepositing);
+        hMap.pixelManagement.approachClawState();
+        if (hMap.pixelManagement.wristDepositing)
+            hMap.pixelManagement.setClawIntakePower(gamepad2.a ? DukConstants.INPUT.CLAW_INTAKE_SPEED : 0);
+
+        //Hanger
+        hMap.hanger.setPower((float) ((gamepad2.left_bumper ? 0.6 : 0) - (gamepad2.right_bumper ? 0.6 : 0)));
+
+        //Airplane
+        if (bGamepad2.onBackPressed()) hMap.pixelManagement.launchAirplane();
+    }
+
     private void checkSafetySwitch() {
         if (bGamepad1.onYPressed())
             blindDrive = !blindDrive;
@@ -91,6 +145,7 @@ public class DirectionlessDrive extends OpMode {
             DashboardInterface.tick(hMap);
         }
 
+        if (!TimeManager.hasFirstCycleRun()) hMap.pixelManagement.dispatchAllCaches();
         TimeManager.onCycle(getRuntime());
 
         hMap.refreshAll();
@@ -98,6 +153,8 @@ public class DirectionlessDrive extends OpMode {
         checkSafetySwitch();
         if (blindDrive) controlChassisBlind();
         else controlChassis();
+        if (blindMechanism) controlMechanismBlind();
+        else controlMechanism();
         hMap.dispatchAll();
         telemetry.addData("Blind Drive", blindDrive);
         telemetry.addData("Blind Mechanism", blindMechanism);
