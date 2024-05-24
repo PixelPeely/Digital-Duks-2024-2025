@@ -67,7 +67,6 @@ public class DriveTrain implements CachedSubsystem {
         moveDirectionRelative(direction-chassisOrientation);
     }
 
-    //Implement a method to return the robot to the boundary region if it ends up outside of it
     public void pursueAutonPoint(float px, float py, float pAdd, float x, float y, float chassisOrientation) {
         float moveDirection = (float) Math.atan2(px - x, py - y);
         moveDirectionAbsolute(chassisOrientation, moveDirection);
@@ -76,8 +75,6 @@ public class DriveTrain implements CachedSubsystem {
         applyMagnitude((float)DukUtilities.clamp(-DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.evaluate(distance + pAdd), 1, -1));
         lastPursuedX = px;
         lastPursuedY = py;
-//        return distance < (point.tolerance + DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_TOLERANCE * DukConstants.HARDWARE.ET_PER_INCH)
-//                || !DukUtilities.isRotationInRange((float)(Math.signum(moveDirection) * (Math.abs(moveDirection) - Math.PI)), point.thetaBeginBoundary, point.thetaEndBoundary);
     }
 
     public void applyMagnitude(float magnitude) {
@@ -101,7 +98,6 @@ public class DriveTrain implements CachedSubsystem {
 
     public void turnTowardsDirectionAbsolute(float chassisOrientation, float direction) {
         DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.target = direction;
-        System.out.println("ChassisOrientation " + chassisOrientation + ", Direciton " + direction);
         turnTowardsDirectionRelative(DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(chassisOrientation));
         lastRequestedTurnDirection = direction;
     }
@@ -136,19 +132,6 @@ public class DriveTrain implements CachedSubsystem {
                 lastPursuedX,
                 lastPursuedY,
                 lastRequestedTurnDirection);
-
-//        double fieldX = lastPursuedX * (1/DukConstants.HARDWARE.ET_PER_INCH);
-//        double fieldY = lastPursuedY * (1/DukConstants.HARDWARE.ET_PER_INCH);
-//        DashboardInterface.bufferPacket.fieldOverlay().setStroke(DukConstants.DEBUG.ROBOT_PURSUIT_STROKE)
-//                .strokePolyline(
-//                        new double[]{fieldX,
-//                                fieldX + (float)Math.sin(lastPursuedAutonPoint.thetaBeginBoundary) * 100,
-//                                fieldX + (float)Math.sin(DukUtilities.constrainAxis(lastPursuedAutonPoint.thetaEndBoundary)) * 100,
-//                                fieldX},
-//                        new double[]{fieldY,
-//                                fieldY + (float)Math.cos(lastPursuedAutonPoint.thetaBeginBoundary) * 100,
-//                                fieldY + (float)Math.cos(DukUtilities.constrainAxis(lastPursuedAutonPoint.thetaEndBoundary)) * 100,
-//                                fieldY});
     }
 
     @Override

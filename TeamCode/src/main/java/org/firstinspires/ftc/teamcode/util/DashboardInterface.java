@@ -6,8 +6,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.Hanger;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.PixelManagement;
 
 @Config
 public class DashboardInterface {
@@ -21,13 +19,6 @@ public class DashboardInterface {
     public static double pursuit_p = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.P;
     public static double pursuit_i = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.I;
     public static double pursuit_d = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.D;
-    public static double lift_p = DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PID.P;
-    public static double lift_i = 0;
-    public static double lift_d = 0;
-    public static double hanger_p = DukConstants.AUTOMATED_CONTROLLER_PARAMS.HANGER_PI.P;
-    public static double hanger_i = 0;
-    public static double wrist_speed = DukConstants.AUTOMATED_CONTROLLER_PARAMS.WRIST_SPEED;
-    public static double intake_speed = DukConstants.INPUT.INTAKE_ROLLER_SPEED  ;
     public static int imageLayer;
     private static int numErrors;
 
@@ -40,8 +31,6 @@ public class DashboardInterface {
     public static class ComponentDispatching {
         public static void apply(DukHardwareMap hMap) {
             CD_DriveTrain.apply(hMap.driveTrain);
-            CD_PixelManagement.apply(hMap.pixelManagement);
-            CD_Hanger.apply(hMap.hanger);
         }
         @Config
         public static class CD_DriveTrain {
@@ -57,34 +46,6 @@ public class DashboardInterface {
             public static boolean backLeft = true;
             public static boolean backRight = true;
         }
-        @Config
-        public static class CD_PixelManagement {
-            public static void apply(PixelManagement pixelManagement) {
-                pixelManagement.intakeRoller.allowDispatch(intakeRoller);
-                pixelManagement.lift.allowDispatch(lift);
-                pixelManagement.wristPivot.allowDispatch(wristPivot);
-                pixelManagement.clawPivot.allowDispatch(clawPivot);
-                pixelManagement.clawIntake.allowDispatch(clawIntake);
-                pixelManagement.airplaneLatch.allowDispatch(airplaneLatch);
-            }
-
-            public static boolean intakeRoller = true;
-            public static boolean lift = true;
-            public static boolean wristPivot = true;
-            public static boolean clawPivot = true;
-            public static boolean clawIntake = true;
-            public static boolean airplaneLatch = true;
-        }
-        @Config
-        public static class CD_Hanger {
-            public static void apply(Hanger hanger) {
-                hanger.hangerMotorL.allowDispatch(hangerMotorL);
-                hanger.hangerMotorR.allowDispatch(hangerMotorR);
-            }
-
-            public static boolean hangerMotorL = true;
-            public static boolean hangerMotorR = true ;
-        }
     }
 
     public static void applyConfig() {
@@ -94,14 +55,6 @@ public class DashboardInterface {
         DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.P = (float)pursuit_p;
         DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.I = (float)pursuit_i;
         DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.D = (float)pursuit_d;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PID.P = (float)lift_p;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PID.I = (float)lift_i;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PID.D = (float)lift_d;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.HANGER_PI.P = (float)(hanger_p);
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.HANGER_PI.I = (float)(hanger_i);
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.WRIST_SPEED = (float)wrist_speed;
-        DukConstants.INPUT.INTAKE_ROLLER_SPEED = (float)intake_speed;
-        DukConstants.WEBCAM.IMAGE_LAYER = imageLayer;
     }
 
     public static void renderRobot(String stroke, double posX, double posY, double heading) {
