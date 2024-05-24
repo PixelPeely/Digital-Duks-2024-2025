@@ -23,8 +23,8 @@ public class DuplexIMU implements CachedSubsystem {
         imuHub = new C_IMU(hardwareMap.tryGet(IMU.class, "imuHub"));
         imuExp = new C_IMU(hardwareMap.tryGet(IMU.class, "imuExp"));
         imuHub.initialize(new BNO055IMUNew.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP)));
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT)));
         imuExp.initialize(new BNO055IMUNew.Parameters(new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
                 RevHubOrientationOnRobot.UsbFacingDirection.UP)));

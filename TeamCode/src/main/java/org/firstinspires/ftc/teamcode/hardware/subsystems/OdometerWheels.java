@@ -31,15 +31,15 @@ public class OdometerWheels implements CachedSubsystem {
 
     public OdometerWheels(HardwareMap hardwareMap) {
         yLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
-        x = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backLeft"));
-        yRight = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backRight"));
+        x = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontRight"));
+        yRight = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backLeft"));
 
         //Behavior is initialized in DriveTrain
         yLeft.invertRefresh = true;
         yLeft.toRefresh[5] = true;
-        yRight.invertRefresh = true;
+        yRight.invertRefresh = false;
         yRight.toRefresh[5] = true;
-        x.invertRefresh = false;
+        x.invertRefresh = true;
         x.toRefresh[5] = true;
         yLeft.refreshCache();
         yRight.refreshCache();
