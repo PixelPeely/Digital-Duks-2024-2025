@@ -28,7 +28,6 @@ public class PIDFCalculator {
     public float evaluate(float currentState) {
         float difference = constrainDifference ? DukUtilities.differenceConstrained(target, currentState) : target - currentState;
         float delta = constrainDifference ? DukUtilities.differenceConstrained(lastState, currentState) : currentState - lastState;
-
         float p = P * difference;
         float i = I * error;
         float d = D * delta / (float)TimeManager.getDeltaTime();
@@ -36,10 +35,6 @@ public class PIDFCalculator {
 
         lastState = currentState;
         error = (float)DukUtilities.clamp(error + difference, I_MAX, -I_MAX);
-
-        if (P > 1 && P < 1.2) {
-            System.out.println("Difference " + difference + ", err " + d);
-        }
 
         return p + i + d + f;
     }

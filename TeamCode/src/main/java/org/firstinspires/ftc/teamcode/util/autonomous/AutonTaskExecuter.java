@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.util.autonomous;
 
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
-import org.firstinspires.ftc.teamcode.util.DukUtilities;
+import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 
 import java.util.ArrayDeque;
@@ -10,8 +10,14 @@ import java.util.List;
 import java.util.Queue;
 
 public class AutonTaskExecuter {
+    private final DukHardwareMap hMap;
+
     public final Queue<AutonTask> tasks = new ArrayDeque<>();
-    private final List<AutonTask> asynchronousTasks = new ArrayList<>();
+    private final List<AutonTask> synchronousTasks = new ArrayList<>();
+
+    public AutonTaskExecuter(DukHardwareMap _hMap) {
+        hMap = _hMap;
+    }
 
     /**
      * Execute next task in the queue
@@ -21,13 +27,13 @@ public class AutonTaskExecuter {
         if (tasks.size() == 0) return true;
         AutonTask currentTask = tasks.peek();
 
-        if (currentTask.runAsynchronous()) {
-            asynchronousTasks.add(currentTask);
+        if (currentTask.runSynchronous()) {
+            synchronousTasks.add(currentTask);
             tasks.remove();
             return false;
         }
         executeTask(currentTask);
-        asynchronousTasks.forEach(this::executeTask);
+        synchronousTasks.forEach(this::executeTask);
         return false;
     }
 
@@ -35,7 +41,7 @@ public class AutonTaskExecuter {
         if (task.shouldTerminate()) {
             task.onTerminate();
             tasks.remove(task);
-            asynchronousTasks.remove(task);
+            synchronousTasks.remove(task);
             if (tasks.size() > 0)
                 tasks.peek().initialize();
         }
@@ -55,11 +61,8 @@ public class AutonTaskExecuter {
     }
 
     public void terminate() {
-        DukHardwareMap.instance.driveTrain.applyMagnitude(0);
-        DukHardwareMap.instance.driveTrain.dispatchAllCaches();
+        hMap.driveTrain.stopMotors();
         PersistentData.available = true;
-        PersistentData.positionX = DukHardwareMap.instance.odometerWheels.positionX;
-        PersistentData.positionY = DukHardwareMap.instance.odometerWheels.positionY;
-        PersistentData.heading = DukUtilities.differenceConstrained(DukHardwareMap.instance.odometerWheels.headingOffset, DukHardwareMap.instance.odometerWheels.getHeading(true));
+        PersistentData.pose = hMap.driveTrain.poseEstimator.getPose();
     }
 }

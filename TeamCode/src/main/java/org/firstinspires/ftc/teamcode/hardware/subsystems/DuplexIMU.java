@@ -63,9 +63,9 @@ public class DuplexIMU implements CachedSubsystem {
         return compositeOrientation;
     }
 
-    public void zeroIMUs(boolean useOdometers) {
-        imuHub.Zero(useOdometers);
-        imuExp.Zero(useOdometers);
+    public void setHeading(float heading) {
+        imuHub.setHeading(heading);
+        imuExp.setHeading(heading);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 
 @Config
 public class DashboardInterface {
@@ -19,7 +20,6 @@ public class DashboardInterface {
     public static double pursuit_p = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.P;
     public static double pursuit_i = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.I;
     public static double pursuit_d = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.D;
-    public static int imageLayer;
     private static int numErrors;
 
     public static void tick(DukHardwareMap hMap) {
@@ -57,9 +57,10 @@ public class DashboardInterface {
         DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.D = (float)pursuit_d;
     }
 
-    public static void renderRobot(String stroke, double posX, double posY, double heading) {
-        double posXIn = posX * (1/DukConstants.HARDWARE.ET_PER_INCH);
-        double posYIn = posY * (1/DukConstants.HARDWARE.ET_PER_INCH);
+    public static void renderRobot(String stroke, Pose pose) {
+        //y=-x, x=y
+        double posYIn = -pose.x * (1/DukConstants.HARDWARE.ET_PER_MM * 0.03937);
+        double posXIn = pose.y * (1/DukConstants.HARDWARE.ET_PER_MM * 0.03937);
         bufferPacket.fieldOverlay()
                 .setStroke(stroke)
                 .strokeRect(posXIn - DukConstants.HARDWARE.ROBOT_SIZE_IN * 0.5,
@@ -68,8 +69,8 @@ public class DashboardInterface {
                         DukConstants.HARDWARE.ROBOT_SIZE_IN)
                 .strokeLine(posXIn,
                         posYIn,
-                        posXIn + Math.sin(heading) * DukConstants.DEBUG.DIRECTION_INDICATOR_LENGTH,
-                        posYIn + Math.cos(heading) * DukConstants.DEBUG.DIRECTION_INDICATOR_LENGTH);
+                        posXIn + Math.cos(pose.getH()) * DukConstants.DEBUG.DIRECTION_INDICATOR_LENGTH,
+                        posYIn - Math.sin(pose.getH()) * DukConstants.DEBUG.DIRECTION_INDICATOR_LENGTH);
     }
 
     public static void dispatchBufferPacket() {

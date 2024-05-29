@@ -3,6 +3,48 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 public class DukUtilities {
+    public static class Vector {
+        private float x;
+        private float y;
+        private float r;
+        private float t;
+
+        public Vector(float a, float b, boolean cartesian) {
+            if (cartesian) {
+                x = a;
+                y = b;
+            } else {
+                r = a;
+                t = b;
+            }
+        }
+
+        public float getX() {
+            if (x == 0 && r != 0) x = r * (float)Math.sin(t);
+            return x;
+        }
+
+        public float getY() {
+            if (y == 0 && r != 0) y = r * (float)Math.cos(t);
+            return y;
+        }
+
+        public float getR() {
+            if (r == 0 && (x != 0 || y != 0)) r = (float)Math.sqrt(x * x + y * y);
+            return r;
+        }
+
+        public float getT() {//TODO apply all changes so that the angle is upward (standard)
+            if (t == 0 && (x != 0 || y != 0)) t = (float)Math.atan2(x, y);
+            return t;
+        }
+
+        public void rotate(float angle) {
+            t = constrainAxis(getT() + angle);
+            x = y = 0;
+        }
+    }
+
     public static float constrainAxis(float a) {
         float result = a;
         while (result > Math.PI)

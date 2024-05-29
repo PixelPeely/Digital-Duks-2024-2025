@@ -9,22 +9,25 @@ import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
+import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
+import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class DriveTrain implements CachedSubsystem {
+    public final PoseEstimator poseEstimator;
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(DriveTrain.class.getSimpleName());
     public final C_DcMotor frontLeft;
     public final C_DcMotor frontRight;
     public final C_DcMotor backLeft;
     public final C_DcMotor backRight;
-
-    private float lastPursuedX = 0;
-    private float lastPursuedY = 0;
-    public float lastRequestedMovementDirection;
-    public float lastRequestedTurnDirection;
+    public boolean pursueHeading, pursuePosition;
+    public Pose targetPose = new Pose();
+    public Vector localDisplacement = new Vector(0, 0, true);
+    public float localHeading = 0;
 
     public DriveTrain(HardwareMap hardwareMap) {
         frontLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
@@ -32,17 +35,36 @@ public class DriveTrain implements CachedSubsystem {
         backLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backLeft"));
         backRight = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backRight"));
 
-        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
         forAllMotors(motor -> {
             motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             motor.setRunMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         });
 
+        poseEstimator = new PoseEstimator(hardwareMap);
         dispatchAllCaches();
+
+        //TODO consider the final target velocity
+        TimeManager.hookTick(t -> {
+            if (pursueHeading) {
+                DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.target = targetPose.getH();
+                turnRelative(DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(poseEstimator.getPose().getH()));
+            }
+            if (pursuePosition) {
+                float distance = DukUtilities.getDistance(poseEstimator.getPose().x, poseEstimator.getPose().y, targetPose.x, targetPose.y);
+                Vector moveVector = new Vector(
+                        (float) Math.atan2(targetPose.x - poseEstimator.getPose().x, targetPose.y - poseEstimator.getPose().y),
+                        -DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.evaluate(distance),
+                        false
+                );
+                displaceVector(moveVector, true);
+            }
+            return false;
+        });
     }
 
     public void forAllMotors(Consumer<C_DcMotor> action) {
@@ -52,8 +74,8 @@ public class DriveTrain implements CachedSubsystem {
         action.accept(backRight);
     }
 
-    public void moveDirectionRelative(double direction) {
-        direction += DukConstants.ORIENTATION.DIRECTION_OFFSET;
+    private void moveRelative(double direction) {
+        direction += Math.PI * 0.25f;
         double _sin = Math.sin(direction);
         double _cos = Math.cos(direction);
         frontLeft.setPower(_sin);
@@ -62,22 +84,11 @@ public class DriveTrain implements CachedSubsystem {
         backLeft.setPower(_cos);
     }
 
-    public void moveDirectionAbsolute(float chassisOrientation, float direction) {
-        lastRequestedMovementDirection = direction;
-        moveDirectionRelative(direction-chassisOrientation);
+    private void moveAbsolute(float direction) {
+        moveRelative(direction - poseEstimator.getPose().getH());
     }
 
-    public void pursueAutonPoint(float px, float py, float pAdd, float x, float y, float chassisOrientation) {
-        float moveDirection = (float) Math.atan2(px - x, py - y);
-        moveDirectionAbsolute(chassisOrientation, moveDirection);
-        float distance = DukUtilities.getDistance(x, y, px, py);
-        //Inverted because the PIDF will try to approach a distance of zero by returning negative values
-        applyMagnitude((float)DukUtilities.clamp(-DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.evaluate(distance + pAdd), 1, -1));
-        lastPursuedX = px;
-        lastPursuedY = py;
-    }
-
-    public void applyMagnitude(float magnitude) {
+    private void applyMagnitude(float magnitude) {
         if (DukConstants.INPUT.MAXIMIZE_MAGNITUDE) {
             AtomicReference<Double> maxValue = new AtomicReference<>((double)0);
             forAllMotors(motor -> maxValue.set(Math.max(maxValue.get(), Math.abs(motor.getPower()))));
@@ -88,18 +99,26 @@ public class DriveTrain implements CachedSubsystem {
         forAllMotors(motor -> motor.setPower(motor.getPower() * finalMagnitude));
     }
 
-    public void turnTowardsDirectionRelative(double directionNormalized) {
-        directionNormalized = DukUtilities.clamp(directionNormalized, 1, -1);
-        frontLeft.setPower(frontLeft.getPower() - directionNormalized);
-        backLeft.setPower(backLeft.getPower() - directionNormalized);
-        frontRight.setPower(frontRight.getPower() + directionNormalized);
-        backRight.setPower(backRight.getPower() + directionNormalized);
+    public void displaceVector(Vector displacement, boolean absolute) {
+        if (absolute) displacement.rotate(-poseEstimator.getPose().getH());
+        localDisplacement = displacement;
+        if (absolute) moveAbsolute(displacement.getT());
+        else moveRelative(displacement.getT());
+        applyMagnitude(displacement.getR());
     }
 
-    public void turnTowardsDirectionAbsolute(float chassisOrientation, float direction) {
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.target = direction;
-        turnTowardsDirectionRelative(DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(chassisOrientation));
-        lastRequestedTurnDirection = direction;
+    private void enactDesiredMovement() {
+        
+    }
+
+    public void stopMotors() {applyMagnitude(0); dispatchAllCaches();}
+
+    public void turnRelative(double magnitude) {
+        magnitude = DukUtilities.clamp(magnitude, 1, -1);
+        frontLeft.setPower(frontLeft.getPower() - magnitude);
+        backLeft.setPower(backLeft.getPower() - magnitude);
+        frontRight.setPower(frontRight.getPower() + magnitude);
+        backRight.setPower(backRight.getPower() + magnitude);
     }
 
     public float getMotorPowerSum() {
@@ -109,33 +128,33 @@ public class DriveTrain implements CachedSubsystem {
     @Override
     public void dispatchAllCaches() {
         forAllMotors(C_DcMotor::dispatchCache);
+        poseEstimator.dispatchAllCaches();
     }
 
     @Override
     public void refreshAllCaches() {
         forAllMotors(C_DcMotor::refreshCache);
+        poseEstimator.refreshAllCaches();
     }
 
     @Override
     public void pushTelemetry() {
-        if (!DukConstants.DEBUG.USE_FTC_DASHBOARD) return;
-
         loggingBuffer.push("Front Left", frontLeft.getPower());
         loggingBuffer.push("Front Right", frontRight.getPower());
         loggingBuffer.push("Back Left", backLeft.getPower());
         loggingBuffer.push("Back Right", backRight.getPower());
-        loggingBuffer.push("Pursuit X", lastPursuedX);
-        loggingBuffer.push("Pursuit Y", lastPursuedY);
+        loggingBuffer.push("Pursuit X", targetPose.x);
+        loggingBuffer.push("Pursuit Y", targetPose.y);
         loggingBuffer.dispatch();
 
-        DashboardInterface.renderRobot(DukConstants.DEBUG.ROBOT_PURSUIT_STROKE,
-                lastPursuedX,
-                lastPursuedY,
-                lastRequestedTurnDirection);
+        DashboardInterface.renderRobot(DukConstants.DEBUG.ROBOT_PURSUIT_STROKE, targetPose);
+
+        poseEstimator.pushTelemetry();
     }
 
     @Override
     public void allowDispatch(boolean state) {
         forAllMotors(motor -> motor.allowDispatch(state));
+        poseEstimator.allowDispatch(state);
     }
 }

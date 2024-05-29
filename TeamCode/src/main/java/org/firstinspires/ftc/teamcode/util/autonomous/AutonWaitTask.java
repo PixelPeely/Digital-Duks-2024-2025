@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.util.autonomous;
 
+import static org.firstinspires.ftc.teamcode.util.autonomous.AutonTask.Base.hMap;
+
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
+import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 public class AutonWaitTask implements AutonTask {
@@ -14,7 +17,7 @@ public class AutonWaitTask implements AutonTask {
     @Override
     public void initialize() {
         waitTime += TimeManager.getTime(false);
-        DukHardwareMap.instance.driveTrain.applyMagnitude(0);
+        hMap.driveTrain.stopMotors();
     }
 
     @Override
@@ -33,7 +36,7 @@ public class AutonWaitTask implements AutonTask {
     }
 
     @Override
-    public boolean runAsynchronous() {
+    public boolean runSynchronous() {
         DashboardInterface.logError("Wait task should not be asynchronous", waitTime);
         return false;
     }

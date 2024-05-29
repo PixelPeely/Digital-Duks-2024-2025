@@ -22,7 +22,6 @@ public class C_TelemetryLoggingBuffer {
         data.put(label, value);
     }
 
-    //Maybe putAll into the DashboardInterface.bufferPacket instead of sending immediately?
     public void dispatch() {
         if (data.isEmpty()) return;
         data.forEach((_label, _object) -> DashboardInterface.bufferPacket.put(name + ":" + _label, _object));

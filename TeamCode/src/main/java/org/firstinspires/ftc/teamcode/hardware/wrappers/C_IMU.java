@@ -50,11 +50,9 @@ public class C_IMU implements CachedPeripheral {
     public AngularVelocity getAngularVelocity() {return angularVelocity;}
     public YawPitchRollAngles getYawPitchRollAngles() {return yawPitchRollAngles;}
 
-    public void Zero(boolean useOdometers) {
+    public void setHeading(float heading) {
         refreshCache();
-        headingOffset = getOrientation().thirdAngle + DukHardwareMap.instance.odometerWheels.headingOffset;
-        if (useOdometers)
-            headingOffset = DukUtilities.constrainAxis(headingOffset - DukHardwareMap.instance.odometerWheels.getHeading(false));
+        headingOffset = getOrientation().thirdAngle - heading;
         DashboardInterface.logError("Zeroed at ", headingOffset);
     }
 

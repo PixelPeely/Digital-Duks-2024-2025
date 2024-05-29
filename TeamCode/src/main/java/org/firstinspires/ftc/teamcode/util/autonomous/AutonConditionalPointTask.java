@@ -30,7 +30,7 @@ public class AutonConditionalPointTask implements AutonTask {
     }
 
     @Override
-    public boolean runAsynchronous() {
-        return pointTaskSupplier.get().runAsynchronous();
+    public boolean runSynchronous() {
+        return pointTaskSupplier.get().runSynchronous();
     }
 }
