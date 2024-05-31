@@ -26,8 +26,8 @@ public class DriveTrain implements CachedSubsystem {
     public final C_DcMotor backRight;
     public boolean pursueHeading, pursuePosition;
     public Pose targetPose = new Pose();
-    public Vector localDisplacement = new Vector(0, 0, true);
-    public float localHeading = 0;
+    private Vector localDisplacement = new Vector(0, 0, true);
+    public float localTurning = 0;
 
     public DriveTrain(HardwareMap hardwareMap) {
         frontLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
@@ -52,7 +52,7 @@ public class DriveTrain implements CachedSubsystem {
         TimeManager.hookTick(t -> {
             if (pursueHeading) {
                 DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.target = targetPose.getH();
-                turnRelative(DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(poseEstimator.getPose().getH()));
+                localTurning = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(poseEstimator.getPose().getH());
             }
             if (pursuePosition) {
                 float distance = DukUtilities.getDistance(poseEstimator.getPose().x, poseEstimator.getPose().y, targetPose.x, targetPose.y);
@@ -63,6 +63,7 @@ public class DriveTrain implements CachedSubsystem {
                 );
                 displaceVector(moveVector, true);
             }
+            enactDesiredMovement();
             return false;
         });
     }
@@ -74,7 +75,7 @@ public class DriveTrain implements CachedSubsystem {
         action.accept(backRight);
     }
 
-    private void moveRelative(double direction) {
+    private void displaceRelative(double direction) {
         direction += Math.PI * 0.25f;
         double _sin = Math.sin(direction);
         double _cos = Math.cos(direction);
@@ -82,10 +83,6 @@ public class DriveTrain implements CachedSubsystem {
         backRight.setPower(_sin);
         frontRight.setPower(_cos);
         backLeft.setPower(_cos);
-    }
-
-    private void moveAbsolute(float direction) {
-        moveRelative(direction - poseEstimator.getPose().getH());
     }
 
     private void applyMagnitude(float magnitude) {
@@ -99,27 +96,26 @@ public class DriveTrain implements CachedSubsystem {
         forAllMotors(motor -> motor.setPower(motor.getPower() * finalMagnitude));
     }
 
-    public void displaceVector(Vector displacement, boolean absolute) {
-        if (absolute) displacement.rotate(-poseEstimator.getPose().getH());
-        localDisplacement = displacement;
-        if (absolute) moveAbsolute(displacement.getT());
-        else moveRelative(displacement.getT());
-        applyMagnitude(displacement.getR());
-    }
-
-    private void enactDesiredMovement() {
-        
-    }
-
-    public void stopMotors() {applyMagnitude(0); dispatchAllCaches();}
-
-    public void turnRelative(double magnitude) {
+    private void turnRelative(double magnitude) {
         magnitude = DukUtilities.clamp(magnitude, 1, -1);
         frontLeft.setPower(frontLeft.getPower() - magnitude);
         backLeft.setPower(backLeft.getPower() - magnitude);
         frontRight.setPower(frontRight.getPower() + magnitude);
         backRight.setPower(backRight.getPower() + magnitude);
     }
+
+    public void displaceVector(Vector displacement, boolean absolute) {
+        if (absolute) displacement.rotate(-poseEstimator.getPose().getH());
+        localDisplacement = displacement;
+    }
+
+    private void enactDesiredMovement() {
+        displaceRelative(localDisplacement.getT());
+        applyMagnitude(localDisplacement.getR());
+        turnRelative(localTurning);
+    }
+
+    public void stopMotors() {applyMagnitude(0); dispatchAllCaches();}
 
     public float getMotorPowerSum() {
         return (float)(frontLeft.getPower() + frontRight.getPower() + backLeft.getPower() + backRight.getPower());

@@ -24,6 +24,7 @@ public class TestTrain extends OpMode {
 
         hMap.driveTrain.targetPose.x += gamepad1.left_stick_x * 100;
         hMap.driveTrain.targetPose.y -= gamepad1.left_stick_y * 100;
+        hMap.driveTrain.displaceVector(new Vector(gamepad1.left_stick_x, -gamepad1.left_stick_y, true), true);
         if (DukUtilities.getJoystickMagnitude(gamepad1, false) > 0.1)
             hMap.driveTrain.targetPose.setH(DukUtilities.getJoystickDirection(gamepad1, false));
 

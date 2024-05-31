@@ -41,6 +41,7 @@ public class DukUtilities {
 
         public void rotate(float angle) {
             t = constrainAxis(getT() + angle);
+            r = getR();
             x = y = 0;
         }
     }

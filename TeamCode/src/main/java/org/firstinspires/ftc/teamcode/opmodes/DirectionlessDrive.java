@@ -5,7 +5,6 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.util.BetterGamepad;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
@@ -13,8 +12,6 @@ import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
-
-import java.sql.Time;
 
 @TeleOp
 public class DirectionlessDrive extends OpMode {
@@ -58,7 +55,7 @@ public class DirectionlessDrive extends OpMode {
         hMap.driveTrain.displaceVector(new Vector(gamepad1.right_stick_x, gamepad1.right_stick_y, true), false);
         hMap.driveTrain.forAllMotors(motor -> motor.setPower(motor.getPower()
                 + (gamepad1.right_trigger - gamepad1.left_trigger) * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER));
-        hMap.driveTrain.turnRelative(gamepad1.left_stick_x + (gamepad1.right_bumper ? 1 : gamepad1.left_bumper ? -1 : 0));
+        hMap.driveTrain.localTurning = gamepad1.left_stick_x + (gamepad1.right_bumper ? 1 : gamepad1.left_bumper ? -1 : 0);
     }
 
     private void checkSafetySwitch() {
