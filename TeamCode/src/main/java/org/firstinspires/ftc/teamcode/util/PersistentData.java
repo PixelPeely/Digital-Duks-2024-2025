@@ -8,8 +8,10 @@ public class PersistentData {
     public static Pose pose;
 
 
-    public static void Apply(DukHardwareMap hMap) {
-        hMap.driveTrain.poseEstimator.setPose(pose);
+    public static void apply(DukHardwareMap hMap) {
+        if (available) {
+            hMap.driveTrain.poseEstimator.setPose(pose);
+        }
         //Todo estimate the pose if velocity is not zero
     }
 }

@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 
 public class AutonPointTask implements AutonTask {
-    private final Pose target;
+    public final Pose target;
     private final float tolerance;
 
     public AutonPointTask(Pose _target, float _tolerance) {

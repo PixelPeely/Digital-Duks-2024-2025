@@ -32,6 +32,7 @@ public class DukConstants {
         public static final boolean OPTIMIZE_PACKETS = true;
         public static final String ROBOT_POSE_STROKE = "Red";
         public static final String ROBOT_PURSUIT_STROKE = "Blue";
+        public static final String PATH_POINT_STROKE = "Green";
         public static final int DIRECTION_INDICATOR_LENGTH = 20;
     }
 

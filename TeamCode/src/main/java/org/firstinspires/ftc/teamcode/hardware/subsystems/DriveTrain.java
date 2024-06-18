@@ -75,6 +75,12 @@ public class DriveTrain implements CachedSubsystem {
         action.accept(backRight);
     }
 
+    private void enactDesiredMovement() {
+        displaceRelative(localDisplacement.getT());
+        applyMagnitude(localDisplacement.getR());
+        turnRelative(localTurning);
+    }
+
     private void displaceRelative(double direction) {
         direction += Math.PI * 0.25f;
         double _sin = Math.sin(direction);
@@ -109,17 +115,7 @@ public class DriveTrain implements CachedSubsystem {
         localDisplacement = displacement;
     }
 
-    private void enactDesiredMovement() {
-        displaceRelative(localDisplacement.getT());
-        applyMagnitude(localDisplacement.getR());
-        turnRelative(localTurning);
-    }
-
     public void stopMotors() {applyMagnitude(0); dispatchAllCaches();}
-
-    public float getMotorPowerSum() {
-        return (float)(frontLeft.getPower() + frontRight.getPower() + backLeft.getPower() + backRight.getPower());
-    }
 
     @Override
     public void dispatchAllCaches() {
