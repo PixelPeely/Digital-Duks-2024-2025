@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.autonomous;
 
-import static org.firstinspires.ftc.teamcode.util.autonomous.AutonTask.Base.hMap;
+import static org.firstinspires.ftc.teamcode.util.autonomous.AutonTask.Base._hardwareMap;
 
-import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
-import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 public class AutonWaitTask implements AutonTask {
@@ -17,7 +15,7 @@ public class AutonWaitTask implements AutonTask {
     @Override
     public void initialize() {
         waitTime += TimeManager.getTime(false);
-        hMap.driveTrain.stopMotors();
+        _hardwareMap.driveTrain.stopMotors();
     }
 
     @Override

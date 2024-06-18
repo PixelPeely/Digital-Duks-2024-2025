@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.teamcode.util.autonomous;
 
 
-import static org.firstinspires.ftc.teamcode.util.autonomous.AutonTask.Base.hMap;
+import static org.firstinspires.ftc.teamcode.util.autonomous.AutonTask.Base._hardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
-import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 
 public class AutonPointTask implements AutonTask {
     public final Pose target;
@@ -19,8 +18,8 @@ public class AutonPointTask implements AutonTask {
 
     @Override
     public void initialize() {
-        hMap.driveTrain.targetPose = target;
-        hMap.driveTrain.pursuePosition = hMap.driveTrain.pursueHeading = true;
+        _hardwareMap.driveTrain.targetPose = target;
+        _hardwareMap.driveTrain.pursuePosition = _hardwareMap.driveTrain.pursueHeading = true;
     }
 
     @Override
@@ -30,18 +29,18 @@ public class AutonPointTask implements AutonTask {
 
     @Override
     public boolean shouldTerminate() {
-        return DukUtilities.getDistance(hMap.driveTrain.poseEstimator.getPose().x, hMap.driveTrain.poseEstimator.getPose().y, target.x, target.y)
+        return DukUtilities.getDistance(_hardwareMap.driveTrain.poseEstimator.getPose().x, _hardwareMap.driveTrain.poseEstimator.getPose().y, target.x, target.y)
                 < tolerance + DukConstants.AUTOMATED_CONTROLLER_PARAMS.STANDARD_PURSUIT_RANGE &&
-                DukUtilities.differenceConstrained(hMap.driveTrain.poseEstimator.getPose().getH(), target.getH())
+                DukUtilities.differenceConstrained(_hardwareMap.driveTrain.poseEstimator.getPose().getH(), target.getH())
                 < DukConstants.AUTOMATED_CONTROLLER_PARAMS.STANDARD_HEADING_RANGE &&
-                hMap.driveTrain.poseEstimator.getPose().s < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_SPEED &&
-                Math.abs(hMap.driveTrain.poseEstimator.getPose().w) < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_ANGULAR_SPEED;
+                _hardwareMap.driveTrain.poseEstimator.getPose().s < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_SPEED &&
+                Math.abs(_hardwareMap.driveTrain.poseEstimator.getPose().w) < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_ANGULAR_SPEED;
     }
 
     @Override
     public void onTerminate() {
-        hMap.driveTrain.stopMotors();
-        hMap.driveTrain.pursuePosition = hMap.driveTrain.pursueHeading = false;
+        _hardwareMap.driveTrain.stopMotors();
+        _hardwareMap.driveTrain.pursuePosition = _hardwareMap.driveTrain.pursueHeading = false;
     }
 
     @Override

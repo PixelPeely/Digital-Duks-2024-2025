@@ -24,7 +24,7 @@ public class DukHardwareMap {
         }
 
         driveTrain = new DriveTrain(hardwareMap);
-        AutonTask.Base.hMap = this;
+        AutonTask.Base._hardwareMap = this;
     }
 
     public void dispatchAll() {

@@ -4,7 +4,7 @@ import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 
 public interface AutonTask {
     abstract class Base {
-        public static DukHardwareMap hMap;
+        public static DukHardwareMap _hardwareMap;
     }
 
     void initialize();
