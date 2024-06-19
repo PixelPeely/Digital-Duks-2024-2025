@@ -64,10 +64,21 @@ public abstract class DukAutonomous extends DukOpMode{
             task.execute();
     }
 
+
+    /**
+     * Enqueue a task for the sequential task executor to run
+     * @param task The task to enqueue
+     */
     public void register(AutonTask task) {
         tasks.offerLast(task);
     }
 
+
+    /**
+     * Short-hand for creating a list to serve as a sequential task branch
+     * @param tasks Tasks that constitute the branch, in execution order
+     * @return A list representing the tasks
+     */
     public List<AutonTask> branch (AutonTask... tasks) {
         return Arrays.asList(tasks);
     }

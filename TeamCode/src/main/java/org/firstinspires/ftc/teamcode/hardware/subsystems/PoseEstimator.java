@@ -4,9 +4,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
+import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
-import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 public class PoseEstimator implements CachedSubsystem {
@@ -20,7 +20,7 @@ public class PoseEstimator implements CachedSubsystem {
         public float vx;
         public float vy;
 
-        public Pose(){}
+        public Pose() {}
 
         public Pose(float _x, float _y) {
             x = _x;
@@ -41,6 +41,16 @@ public class PoseEstimator implements CachedSubsystem {
             vy = _vy;
             s = (float)Math.sqrt(vx * vx + vy * vy);
             w = _w;
+        }
+
+        public Pose(Pose pose) {
+            x = pose.x;
+            y = pose.y;
+            h = pose.h;
+            w = pose.w;
+            s = pose.s;
+            vx = pose.vx;
+            vy = pose.vy;
         }
 
         public float getH() {return h;}
@@ -66,8 +76,8 @@ public class PoseEstimator implements CachedSubsystem {
     }
 
     public void setPose(Pose _pose) {
-        pose = _pose;
-        odometerWheels.pose = _pose;
+        pose = new Pose(_pose);
+        odometerWheels.pose = new Pose(_pose);
     }
 
     public Pose getPose() {return pose;}
@@ -84,10 +94,12 @@ public class PoseEstimator implements CachedSubsystem {
         duplexIMU.refreshAllCaches();
         float inverseDelta = 1/(float)TimeManager.getDeltaTime();
 
-        setPose(new Pose(odometerWheels.pose.x, odometerWheels.pose.y, odometerWheels.pose.getH(),
-                odometerWheels.pose.vx * inverseDelta,
-                odometerWheels.pose.vy * inverseDelta,
-                odometerWheels.pose.w * inverseDelta));
+        Pose wheels = odometerWheels.pose;
+
+        setPose(new Pose(wheels.x, wheels.y, wheels.getH(),
+                wheels.vx * inverseDelta,
+                wheels.vy * inverseDelta,
+                wheels.w * inverseDelta));
     }
 
     @Override
@@ -96,6 +108,7 @@ public class PoseEstimator implements CachedSubsystem {
         loggingBuffer.push("Pose Y", pose.y);
         loggingBuffer.push("Pose H", pose.getH());
         loggingBuffer.dispatch();
+        DashboardInterface.renderRobot(DukConstants.DEBUG.ROBOT_POSE_STROKE, pose);
 
         odometerWheels.pushTelemetry();
         duplexIMU.pushTelemetry();

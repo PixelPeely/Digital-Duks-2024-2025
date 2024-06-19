@@ -6,7 +6,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
 
 public class DukConstants {
     public static final class INPUT {
@@ -32,16 +31,17 @@ public class DukConstants {
         public static final boolean OPTIMIZE_PACKETS = true;
         public static final String ROBOT_POSE_STROKE = "Red";
         public static final String ROBOT_PURSUIT_STROKE = "Blue";
-        public static final String PATH_POINT_STROKE = "Green";
         public static final int DIRECTION_INDICATOR_LENGTH = 20;
     }
 
     //Measurements are in encoder ticks
     public static final class HARDWARE {
         public static final double ET_PER_MM = 4096 / (35 * Math.PI);
-        public static final int ET_PER_ROBOT_REVOLUTION_Y = 32651;
-        public static final int ET_PER_ROBOT_REVOLUTION_X = 12990; //Circumference of circle about X pivot
+        public static final int ET_PER_PIVOT_REVOLUTION = 33292;//Circumference of pivot circle
+        public static final int ET_PER_ROBOT_REVOLUTION_Y = 0; //Circumference of circle about robot tangent to pivot center
+        public static int ET_PER_ROBOT_REVOLUTION_X = -17000; //Circumference of circle about robot tangent to X
         public static final double ROBOT_SIZE_IN = 15;
+
     }
 
     public static final class AUTOMATED_CONTROLLER_PARAMS {

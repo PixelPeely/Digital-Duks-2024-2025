@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
-import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 
@@ -80,7 +79,6 @@ public class OdometerWheels implements CachedSubsystem {
         loggingBuffer.push("x Raw", x.getCurrentPosition());
         loggingBuffer.push("yRight Raw", yRight.getCurrentPosition());
         loggingBuffer.dispatch();
-        DashboardInterface.renderRobot(DukConstants.DEBUG.ROBOT_POSE_STROKE, pose);
     }
 
     @Override
@@ -92,12 +90,13 @@ public class OdometerWheels implements CachedSubsystem {
 
     private void updateHeadingDelta() {
         pose.w = (yLeft.getCurrentPosition() - yLastLeftET - yRight.getCurrentPosition() + yLastRightET)
-            * (float)(Math.PI / DukConstants.HARDWARE.ET_PER_ROBOT_REVOLUTION_Y);
+            * (float)(Math.PI / DukConstants.HARDWARE.ET_PER_PIVOT_REVOLUTION);
     }
 
     private void updatePositionDelta() {
-        double yTicks = (yLeft.getCurrentPosition() - yLastLeftET + yRight.getCurrentPosition() - yLastRightET) * 0.5;
-        double xTicks = x.getCurrentPosition() - xLastET - pose.w * (DukConstants.HARDWARE.ET_PER_ROBOT_REVOLUTION_X / (2 * Math.PI));
+        double arcPercent = pose.w / (2 * Math.PI);
+        double yTicks = (yLeft.getCurrentPosition() - yLastLeftET + yRight.getCurrentPosition() - yLastRightET) * 0.5 - arcPercent * DukConstants.HARDWARE.ET_PER_ROBOT_REVOLUTION_Y;
+        double xTicks = x.getCurrentPosition() - xLastET - arcPercent * DukConstants.HARDWARE.ET_PER_ROBOT_REVOLUTION_X;
         double averageHeading = pose.getH() - pose.w * 0.5;
         double hSin = Math.sin(averageHeading);
         double hCos = Math.cos(averageHeading);

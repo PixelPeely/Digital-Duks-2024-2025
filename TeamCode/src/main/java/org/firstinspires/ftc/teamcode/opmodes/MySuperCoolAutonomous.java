@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 import org.firstinspires.ftc.teamcode.util.autonomous.*;
 
-public class MySuperCoolAutonomous extends DukAutonomous{
+@Autonomous
+public class MySuperCoolAutonomous extends DukAutonomous {
     @Override
     public void buildAutonomous() {
         register(new AutonBranchTask(() -> {

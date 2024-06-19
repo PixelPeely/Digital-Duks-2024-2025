@@ -9,14 +9,21 @@ public class DukUtilities {
         private float r;
         private float t;
 
-        public Vector(float a, float b, boolean cartesian) {
+        public Vector(float _x, float _y, boolean cartesian) {
             if (cartesian) {
-                x = a;
-                y = b;
+                x = _x;
+                y = _y;
             } else {
-                r = a;
-                t = b;
+                r = _x;
+                t = _y;
             }
+        }
+
+        public Vector(Vector vector) {
+            x = vector.x;
+            y = vector.y;
+            r = vector.r;
+            t = vector.t;
         }
 
         public float getX() {
@@ -34,7 +41,7 @@ public class DukUtilities {
             return r;
         }
 
-        public float getT() {//TODO apply all changes so that the angle is upward (standard)
+        public float getT() {
             if (t == 0 && (x != 0 || y != 0)) t = (float)Math.atan2(x, y);
             return t;
         }
@@ -59,9 +66,6 @@ public class DukUtilities {
         float distance = constrainAxis(b-a);
         float inverse_distance = constrainAxis(a-b);
         return -(Math.abs(distance) < Math.abs(inverse_distance) ? distance : inverse_distance);
-//        float distance = Math.abs(b - a);
-//        float inverse_distance = 2 * (float)Math.PI - Math.abs(b) - Math.abs(a);
-//        return Math.min(distance, inverse_distance) == distance ? b - a : (a < b ? -inverse_distance : inverse_distance);
     }
 
     public static double clamp(double value, double max, double min) {
