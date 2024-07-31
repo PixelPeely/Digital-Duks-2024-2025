@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.util;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
+
 public class DukUtilities {
     public static class Vector {
         private float x;
@@ -108,5 +110,12 @@ public class DukUtilities {
 
     public static float servoPositionToRotation(float position, float offset, float scaleLow, float scaleHigh) {
         return scaleLow + (position - offset) * 2 * (float)Math.PI * Math.abs(scaleLow - scaleHigh);
+    }
+
+    public static void mapPose(float heading, Pose toMap, Vector offset, boolean toGlobal) {
+        Vector _offset = new Vector(offset);
+        _offset.rotate(heading);
+        toMap.x += _offset.getX() * (toGlobal ? -1 : 1);
+        toMap.y += _offset.getY() * (toGlobal ? -1 : 1);
     }
 }

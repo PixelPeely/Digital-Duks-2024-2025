@@ -38,7 +38,6 @@ public class TestTrain extends DukOpMode {
 
     @Override
     public void stop() {
-        TimeManager.reset();
         super.stop();
     }
 }

@@ -37,9 +37,9 @@ public class DukConstants {
     //Measurements are in encoder ticks
     public static final class HARDWARE {
         public static final double ET_PER_MM = 4096 / (35 * Math.PI);
-        public static final int ET_PER_PIVOT_REVOLUTION = 33292;//Circumference of pivot circle
-        public static final int ET_PER_ROBOT_REVOLUTION_Y = 0; //Circumference of circle about robot tangent to pivot center
-        public static int ET_PER_ROBOT_REVOLUTION_X = -17000; //Circumference of circle about robot tangent to X
+        public static final int ET_PER_ROBOT_REVOLUTION = 33292;//Circumference of pivot circle
+        //Intersection of parallel center axis with perpendicular axis
+        public static final DukUtilities.Vector ODOMETER_CENTER = new DukUtilities.Vector(0, 0, true);
         public static final double ROBOT_SIZE_IN = 15;
 
     }
