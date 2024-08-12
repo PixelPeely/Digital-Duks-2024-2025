@@ -49,7 +49,7 @@ public abstract class DukOpMode extends OpMode {
     public void stop() {
         TimeManager.reset();
         _hardwareMap.driveTrain.stopMotors();
-        Logger.writeLog(!PersistentData.available);
+        Logger.writeLog(!PersistentData.available);//Will only be available if auto has run
         PersistentData.available = false;
         super.stop();
     }
