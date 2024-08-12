@@ -15,10 +15,9 @@ public abstract class DukAutonomous extends DukOpMode{
     private final List<AutonTask> synchronousTasks = new ArrayList<>();
 
     @Override
-    public void setup() {
+    public void init() {
+        super.init();
         buildAutonomous();
-        _hardwareMap.driveTrain.pursueHeading = true;
-        _hardwareMap.driveTrain.pursuePosition = true;
     }
 
     @Override
@@ -26,7 +25,10 @@ public abstract class DukAutonomous extends DukOpMode{
 
     @Override
     public void preTick() {
-        if (tasks.size() == 0) stop();
+        if (tasks.size() == 0) {
+            requestOpModeStop();
+            return;
+        }
         AutonTask currentTask = tasks.peekFirst();
 
         if (currentTask.runSynchronous()) {
@@ -42,17 +44,17 @@ public abstract class DukAutonomous extends DukOpMode{
 
     @Override
     public void stop() {
+        super.stop();
         PersistentData.available = true;
         PersistentData.pose = _hardwareMap.driveTrain.poseEstimator.getPose();
-        super.stop();
     }
 
     private void executeTask(AutonTask task) {
         if (task.shouldTerminate()) {
             task.onTerminate();
-            tasks.remove(task);//TODO maybe just change to removeFirst()?
+            tasks.remove(task);
 
-            if (task instanceof AutonBranchTask)//TODO TEST!!
+            if (task instanceof AutonBranchTask)
                 for (AutonTask resolvedTask : ((AutonBranchTask) task).resolve())
                     tasks.offerFirst(resolvedTask);
 

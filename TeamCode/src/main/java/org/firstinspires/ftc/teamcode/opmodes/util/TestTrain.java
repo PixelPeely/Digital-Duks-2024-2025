@@ -1,25 +1,18 @@
 package org.firstinspires.ftc.teamcode.opmodes.util;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.opmodes.DukOpMode;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
-import org.firstinspires.ftc.teamcode.util.GamepadExt;
-import org.firstinspires.ftc.teamcode.util.TimeManager;
+import org.firstinspires.ftc.teamcode.util.Logger;
 
 @TeleOp
 public class TestTrain extends DukOpMode {
     @Override
-    public void setup() {
+    public void init() {
+        super.init();
         _hardwareMap.driveTrain.pursueHeading = true;
-    }
-
-    @Override
-    public void start() {
-
     }
 
     @Override

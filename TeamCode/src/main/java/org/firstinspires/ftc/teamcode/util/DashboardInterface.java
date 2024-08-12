@@ -59,18 +59,17 @@ public class DashboardInterface {
 
     public static void renderRobot(String stroke, Pose pose) {
         //y=-x, x=y
-        double posYIn = -pose.x * (1/DukConstants.HARDWARE.ET_PER_MM * 0.03937);
-        double posXIn = pose.y * (1/DukConstants.HARDWARE.ET_PER_MM * 0.03937);
+        DukUtilities.Vector pos = DukUtilities.ETToFieldCoords(pose);
         bufferPacket.fieldOverlay()
                 .setStroke(stroke)
-                .strokeRect(posXIn - DukConstants.HARDWARE.ROBOT_SIZE_IN * 0.5,
-                        posYIn - DukConstants.HARDWARE.ROBOT_SIZE_IN * 0.5,
+                .strokeRect(pos.getX() - DukConstants.HARDWARE.ROBOT_SIZE_IN * 0.5,
+                        pos.getY() - DukConstants.HARDWARE.ROBOT_SIZE_IN * 0.5,
                         DukConstants.HARDWARE.ROBOT_SIZE_IN,
                         DukConstants.HARDWARE.ROBOT_SIZE_IN)
-                .strokeLine(posXIn,
-                        posYIn,
-                        posXIn + Math.cos(pose.getH()) * DukConstants.DEBUG.DIRECTION_INDICATOR_LENGTH,
-                        posYIn - Math.sin(pose.getH()) * DukConstants.DEBUG.DIRECTION_INDICATOR_LENGTH);
+                .strokeLine(pos.getX(),
+                        pos.getY(),
+                        pos.getX() + Math.cos(pose.getH()) * DukConstants.DEBUG.DIRECTION_INDICATOR_LENGTH,
+                        pos.getY() - Math.sin(pose.getH()) * DukConstants.DEBUG.DIRECTION_INDICATOR_LENGTH);
     }
 
     public static void dispatchBufferPacket() {
@@ -79,7 +78,7 @@ public class DashboardInterface {
     }
 
     //Does not buffer
-    public static void logError(String label, Object data) {
+    public static void immediateError(String label, Object data) {
         if (dashboard == null) return;
         numErrors++;
         TelemetryPacket packet = new TelemetryPacket();

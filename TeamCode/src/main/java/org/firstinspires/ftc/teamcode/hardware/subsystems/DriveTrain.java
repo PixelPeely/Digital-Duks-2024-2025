@@ -43,10 +43,10 @@ public class DriveTrain implements CachedSubsystem {
         forAllMotors(motor -> {
             motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             motor.setRunMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+            motor.dispatchCache();
         });
 
         poseEstimator = new PoseEstimator(hardwareMap);
-        dispatchAllCaches();
 
         //TODO consider the final target velocity
         TimeManager.hookTick(t -> {
@@ -57,8 +57,8 @@ public class DriveTrain implements CachedSubsystem {
             if (pursuePosition) {
                 float distance = DukUtilities.getDistance(poseEstimator.getPose().x, poseEstimator.getPose().y, targetPose.x, targetPose.y);
                 Vector moveVector = new Vector(
-                        (float) Math.atan2(targetPose.x - poseEstimator.getPose().x, targetPose.y - poseEstimator.getPose().y),
                         -DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.evaluate(distance),
+                        (float) Math.atan2(targetPose.x - poseEstimator.getPose().x, targetPose.y - poseEstimator.getPose().y),
                         false
                 );
                 displaceVector(moveVector, true);
@@ -125,7 +125,7 @@ public class DriveTrain implements CachedSubsystem {
 
     @Override
     public void refreshAllCaches() {
-        forAllMotors(C_DcMotor::refreshCache);
+        //forAllMotors(C_DcMotor::refreshCache);
         poseEstimator.refreshAllCaches();
     }
 
@@ -139,7 +139,7 @@ public class DriveTrain implements CachedSubsystem {
         loggingBuffer.push("Pursuit Y", targetPose.y);
         loggingBuffer.dispatch();
 
-        DashboardInterface.renderRobot(DukConstants.DEBUG.ROBOT_PURSUIT_STROKE, targetPose);
+        DashboardInterface.renderRobot(DukConstants.DEBUG.STROKES.ROBOT_PURSUIT_STROKE, targetPose);
 
         poseEstimator.pushTelemetry();
     }

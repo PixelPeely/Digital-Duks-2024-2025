@@ -26,12 +26,16 @@ public class DukConstants {
     }
 
     public static final class DEBUG {
+        public static final class STROKES {
+            public static final String ROBOT_POSE_STROKE = "Brown";
+            public static final String ROBOT_PURSUIT_STROKE = "Blue";
+            public static final String ODOMETER_WHEELS_STROKE = "Red";
+        }
         public static final boolean USE_FTC_DASHBOARD = true;
         public static final int PACKET_TRANSMISSION_INTERVAL = 20;
         public static final boolean OPTIMIZE_PACKETS = true;
-        public static final String ROBOT_POSE_STROKE = "Red";
-        public static final String ROBOT_PURSUIT_STROKE = "Blue";
         public static final int DIRECTION_INDICATOR_LENGTH = 20;
+        public static final String LOG_DIRECTORY = "/sdcard/FIRST/java/src/runtimeLogs";
     }
 
     //Measurements are in encoder ticks
@@ -39,7 +43,7 @@ public class DukConstants {
         public static final double ET_PER_MM = 4096 / (35 * Math.PI);
         public static final int ET_PER_ROBOT_REVOLUTION = 33292;//Circumference of pivot circle
         //Intersection of parallel center axis with perpendicular axis
-        public static final DukUtilities.Vector ODOMETER_CENTER = new DukUtilities.Vector(0, 0, true);
+        public static final DukUtilities.Vector ODOMETER_CENTER = new DukUtilities.Vector(0, -1000, true);
         public static final double ROBOT_SIZE_IN = 15;
 
     }

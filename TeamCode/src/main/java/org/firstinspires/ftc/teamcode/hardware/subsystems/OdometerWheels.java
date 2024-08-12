@@ -6,8 +6,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
+import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
+import org.firstinspires.ftc.teamcode.util.DukUtilities;
 
 public class OdometerWheels implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(OdometerWheels.class.getSimpleName());
@@ -21,7 +23,7 @@ public class OdometerWheels implements CachedSubsystem {
     public float totalDeltaET;
 
     //vx, vy, and w are deltas!
-    public Pose pose = new Pose();
+    public Pose pose = new Pose(DukConstants.HARDWARE.ODOMETER_CENTER.getX(), DukConstants.HARDWARE.ODOMETER_CENTER.getY());
 
     public OdometerWheels(HardwareMap hardwareMap) {
         yLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
@@ -41,7 +43,6 @@ public class OdometerWheels implements CachedSubsystem {
         yLastLeftET = yLeft.getCurrentPosition();
         yLastRightET = yRight.getCurrentPosition();
         xLastET = x.getCurrentPosition();
-        dispatchAllCaches();
     }
 
     @Override
@@ -79,6 +80,9 @@ public class OdometerWheels implements CachedSubsystem {
         loggingBuffer.push("x Raw", x.getCurrentPosition());
         loggingBuffer.push("yRight Raw", yRight.getCurrentPosition());
         loggingBuffer.dispatch();
+
+        DukUtilities.Vector fieldPos = DukUtilities.ETToFieldCoords(pose);
+        DashboardInterface.bufferPacket.fieldOverlay().setFill(DukConstants.DEBUG.STROKES.ODOMETER_WHEELS_STROKE).fillCircle(fieldPos.getX(), fieldPos.getY(), 1);
     }
 
     @Override

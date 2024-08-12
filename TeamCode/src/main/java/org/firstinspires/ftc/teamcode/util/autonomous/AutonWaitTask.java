@@ -35,7 +35,6 @@ public class AutonWaitTask implements AutonTask {
 
     @Override
     public boolean runSynchronous() {
-        DashboardInterface.logError("Wait task should not be asynchronous", waitTime);
         return false;
     }
 }

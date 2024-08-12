@@ -74,7 +74,6 @@ public class PoseEstimator implements CachedSubsystem {
 //            return false;
 //        });
     }
-
     public void setPose(Pose _pose) {
         pose = new Pose(_pose);
         Pose wheelPose = new Pose(_pose);
@@ -97,7 +96,7 @@ public class PoseEstimator implements CachedSubsystem {
         float inverseDelta = 1/(float)TimeManager.getDeltaTime();
 
         Pose wheels = new Pose(odometerWheels.pose);
-        DukUtilities.mapPose(pose.getH(), wheels, DukConstants.HARDWARE.ODOMETER_CENTER, true);
+        DukUtilities.mapPose(odometerWheels.pose.getH(), wheels, DukConstants.HARDWARE.ODOMETER_CENTER, true);
 
         setPose(new Pose(wheels.x, wheels.y, wheels.getH(),
                 wheels.vx * inverseDelta,
@@ -111,7 +110,7 @@ public class PoseEstimator implements CachedSubsystem {
         loggingBuffer.push("Pose Y", pose.y);
         loggingBuffer.push("Pose H", pose.getH());
         loggingBuffer.dispatch();
-        DashboardInterface.renderRobot(DukConstants.DEBUG.ROBOT_POSE_STROKE, pose);
+        DashboardInterface.renderRobot(DukConstants.DEBUG.STROKES.ROBOT_POSE_STROKE, pose);
 
         odometerWheels.pushTelemetry();
         duplexIMU.pushTelemetry();

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.hardware.wrappers;
 
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -10,10 +9,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.hardware.CachedPeripheral;
-import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
-import org.firstinspires.ftc.teamcode.util.DukUtilities;
 
 public class C_IMU implements CachedPeripheral {
     private final IMU trueImu;
@@ -31,7 +28,7 @@ public class C_IMU implements CachedPeripheral {
     public AngleUnit angleUnit;
 
     public C_IMU(IMU imu) {
-        if (imu == null) DashboardInterface.logError("C_IMU is null, running as dummy!", null);
+        if (imu == null) DashboardInterface.immediateError("C_IMU is null, running as dummy!", null);
         trueImu = imu;
     }
 
@@ -53,7 +50,6 @@ public class C_IMU implements CachedPeripheral {
     public void setHeading(float heading) {
         refreshCache();
         headingOffset = getOrientation().thirdAngle - heading;
-        DashboardInterface.logError("Zeroed at ", headingOffset);
     }
 
     @Override

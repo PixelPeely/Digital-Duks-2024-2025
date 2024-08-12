@@ -4,10 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
+import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.GamepadExt;
+import org.firstinspires.ftc.teamcode.util.Logger;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
+
+import java.sql.Time;
 
 public abstract class DukOpMode extends OpMode {
     public DukHardwareMap _hardwareMap;
@@ -23,12 +28,15 @@ public abstract class DukOpMode extends OpMode {
         telemetry.addData("Persistent Available", PersistentData.available);
         PersistentData.apply(_hardwareMap);
         _hardwareMap.driveTrain.targetPose = _hardwareMap.driveTrain.poseEstimator.getPose();
-        setup();
+    }
+
+    @Override
+    public void start() {
+        TimeManager.onTick(time);
     }
 
     @Override
     public void loop() {
-        if (!TimeManager.hasFirstTickRun()) start();
         _hardwareMap.refreshAll();
         preTick();
         TimeManager.onTick(time);
@@ -41,19 +49,10 @@ public abstract class DukOpMode extends OpMode {
     public void stop() {
         TimeManager.reset();
         _hardwareMap.driveTrain.stopMotors();
+        Logger.writeLog(!PersistentData.available);
+        PersistentData.available = false;
         super.stop();
     }
-
-
-    /**
-     * Called when "init" is pressed on the driver station after the OpMode has been set up
-     */
-    public abstract void setup();
-
-    /**
-     * Called only once during the first loop cycle when the program starts (before refreshing hardware)
-     */
-    public abstract void start();
 
     /**
      * Called every loop before TimeManager is ticked

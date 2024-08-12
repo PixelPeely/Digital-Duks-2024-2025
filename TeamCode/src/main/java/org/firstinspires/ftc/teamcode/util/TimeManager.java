@@ -13,13 +13,9 @@ public class TimeManager {
 
     private static List<Predicate<Double>> tasks = new ArrayList<>();
 
-    public static boolean hasFirstTickRun() {
-        return currentTime != -1;
-    }
-
     //Called at the end of every tick
     public static void onTick(double time) {
-        if (hasFirstTickRun()) deltaTime = time - currentTime;
+        if (currentTime != -1) deltaTime = time - currentTime;
         else initTime = time;
         currentTime = time;
         tasks.removeIf(task -> task.test(currentTime));

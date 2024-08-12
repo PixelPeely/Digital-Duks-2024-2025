@@ -11,13 +11,13 @@ public class DukUtilities {
         private float r;
         private float t;
 
-        public Vector(float _x, float _y, boolean cartesian) {
+        public Vector(float _xr, float _yt, boolean cartesian) {
             if (cartesian) {
-                x = _x;
-                y = _y;
+                x = _xr;
+                y = _yt;
             } else {
-                r = _x;
-                t = _y;
+                r = _xr;
+                t = _yt;
             }
         }
 
@@ -117,5 +117,9 @@ public class DukUtilities {
         _offset.rotate(heading);
         toMap.x += _offset.getX() * (toGlobal ? -1 : 1);
         toMap.y += _offset.getY() * (toGlobal ? -1 : 1);
+    }
+
+    public static Vector ETToFieldCoords(Pose pose) {
+        return new Vector(pose.y * (0.03937f/(float)DukConstants.HARDWARE.ET_PER_MM), -pose.x * (0.03937f/(float)DukConstants.HARDWARE.ET_PER_MM), true);
     }
 }

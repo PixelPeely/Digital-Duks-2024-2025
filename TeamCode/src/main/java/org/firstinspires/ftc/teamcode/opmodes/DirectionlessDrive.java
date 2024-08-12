@@ -15,13 +15,9 @@ public class DirectionlessDrive extends DukOpMode {
     boolean blindDrive, blindMechanism;
 
     @Override
-    public void setup() {
+    public void init() {
+        super.init();
         _hardwareMap.driveTrain.pursueHeading = true;
-    }
-
-    @Override
-    public void start() {
-
     }
 
     private void controlChassis() {
@@ -38,7 +34,7 @@ public class DirectionlessDrive extends DukOpMode {
             targetHeading = targetHeading + (gamepad1.right_bumper ? DukConstants.INPUT.MANUAL_TURN_CONTROL_MULTIPLIER : -DukConstants.INPUT.MANUAL_TURN_CONTROL_MULTIPLIER);
 
         _hardwareMap.driveTrain.targetPose.setH(targetHeading);
-        _hardwareMap.driveTrain.displaceVector(new Vector(gamepad1.right_stick_x, gamepad1.right_stick_y, true), true);
+        _hardwareMap.driveTrain.displaceVector(new Vector(gamepad1.right_stick_x, -gamepad1.right_stick_y, true), true);
         _hardwareMap.driveTrain.forAllMotors(motor -> motor.setPower(motor.getPower()
                 + (gamepad1.left_trigger - gamepad1.right_trigger) * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER));
     }
