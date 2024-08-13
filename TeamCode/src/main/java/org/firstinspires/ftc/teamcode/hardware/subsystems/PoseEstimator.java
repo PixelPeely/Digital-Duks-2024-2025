@@ -16,8 +16,8 @@ public class PoseEstimator implements CachedSubsystem {
     public static class Pose {
         public Vector pos;
         public Vector vel;
-        private float h;
-        public float w;
+        private double h;
+        public double w;
 
         public Pose() {}
 
@@ -25,12 +25,12 @@ public class PoseEstimator implements CachedSubsystem {
             pos = new Vector(_pos);
         }
 
-        public Pose(Vector _pos, float _h) {
+        public Pose(Vector _pos, double _h) {
             pos = new Vector(_pos);
             setH(_h);
         }
 
-        public Pose(Vector _pos, Vector _vel, float _h, float _w) {
+        public Pose(Vector _pos, Vector _vel, double _h, double _w) {
             pos = new Vector(_pos);
             vel = _vel;
             setH(_h);
@@ -44,9 +44,9 @@ public class PoseEstimator implements CachedSubsystem {
             w = pose.w;
         }
 
-        public float getH() {return h;}
+        public double getH() {return h;}
 
-        public void setH(float _h) {
+        public void setH(double _h) {
             h = DukUtilities.angleWrap(_h);
         }
     }
@@ -85,7 +85,7 @@ public class PoseEstimator implements CachedSubsystem {
     public void refreshAllCaches() {
         odometerWheels.refreshAllCaches();
         duplexIMU.refreshAllCaches();
-        float inverseDelta = 1/(float)TimeManager.getDeltaTime();
+        double inverseDelta = 1/TimeManager.getDeltaTime();
 
         Pose wheels = new Pose(odometerWheels.pose);
         DukUtilities.mapPose(odometerWheels.pose.getH(), wheels, DukConstants.HARDWARE.ODOMETER_CENTER, true);

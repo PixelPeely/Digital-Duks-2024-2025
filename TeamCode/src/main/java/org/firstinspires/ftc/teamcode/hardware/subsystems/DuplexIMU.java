@@ -63,7 +63,7 @@ public class DuplexIMU implements CachedSubsystem {
         return compositeOrientation;
     }
 
-    public void setHeading(float heading) {
+    public void setHeading(double heading) {
         imuHub.setHeading(heading);
         imuExp.setHeading(heading);
     }

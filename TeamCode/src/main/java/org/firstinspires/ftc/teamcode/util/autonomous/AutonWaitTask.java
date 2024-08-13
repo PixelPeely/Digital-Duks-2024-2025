@@ -6,9 +6,9 @@ import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 public class AutonWaitTask implements AutonTask {
-    private float waitTime;
+    private double waitTime;
 
-    public AutonWaitTask(float _waitTime) {
+    public AutonWaitTask(double _waitTime) {
         waitTime = _waitTime;
     }
 

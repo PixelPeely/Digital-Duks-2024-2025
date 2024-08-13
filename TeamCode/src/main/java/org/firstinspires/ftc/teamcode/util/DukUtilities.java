@@ -6,18 +6,18 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 
 public class DukUtilities {
 
-    public static float angleWrap(float a) {
-        float result = a;
+    public static double angleWrap(double a) {
+        double result = a;
         while (result > Math.PI)
             result -= Math.PI;
         while (result < -Math.PI)
             result += Math.PI;
-        return (float)(result == a ? a : result < 0 ? result + Math.PI : result > 0 ? result - Math.PI : 0);
+        return (result == a ? a : result < 0 ? result + Math.PI : result > 0 ? result - Math.PI : 0);
     }
 
-    public static float wrappedAngleDifference(float a, float b) {
-        float distance = angleWrap(b-a);
-        float inverse_distance = angleWrap(a-b);
+    public static double wrappedAngleDifference(double a, double b) {
+        double distance = angleWrap(b-a);
+        double inverse_distance = angleWrap(a-b);
         return -(Math.abs(distance) < Math.abs(inverse_distance) ? distance : inverse_distance);
     }
 
@@ -26,7 +26,7 @@ public class DukUtilities {
         return Math.max(min, Math.min(max, value));
     }
 
-    public static boolean isRotationInRange(float a, float boundaryBegin, float boundaryEnd) {
+    public static boolean isRotationInRange(double a, double boundaryBegin, double boundaryEnd) {
         return (boundaryBegin > 0 && boundaryEnd > 0) ? (
                     (boundaryBegin < boundaryEnd) ?
                             boundaryBegin < a && a < boundaryEnd :
@@ -40,11 +40,11 @@ public class DukUtilities {
                 );
     }
 
-    public static float servoPositionToRotation(float position, float offset, float scaleLow, float scaleHigh) {
-        return scaleLow + (position - offset) * 2 * (float)Math.PI * Math.abs(scaleLow - scaleHigh);
+    public static double servoPositionToRotation(double position, double offset, double scaleLow, double scaleHigh) {
+        return scaleLow + (position - offset) * 2 * Math.PI * Math.abs(scaleLow - scaleHigh);
     }
 
-    public static void mapPose(float heading, Pose toMap, Vector offset, boolean toGlobal) {
+    public static void mapPose(double heading, Pose toMap, Vector offset, boolean toGlobal) {
         Vector _offset = new Vector(offset);
         _offset.rotate(heading);
         if (toGlobal) _offset.negate();
@@ -53,7 +53,7 @@ public class DukUtilities {
 
     public static Vector ETToFieldCoords(Pose pose) {
         Vector pos = new Vector(pose.pos);
-        pos.scale(0.03937f/(float)DukConstants.HARDWARE.ET_PER_MM);
+        pos.scale(0.03937f/DukConstants.HARDWARE.ET_PER_MM);
         return new Vector(pos.getY(), -pos.getX());
     }
 }

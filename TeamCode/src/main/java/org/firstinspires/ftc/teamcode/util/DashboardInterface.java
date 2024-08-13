@@ -49,12 +49,12 @@ public class DashboardInterface {
     }
 
     public static void applyConfig() {
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.P = (float)rotation_p;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.I = (float)rotation_i;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.D = (float)rotation_d;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.P = (float)pursuit_p;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.I = (float)pursuit_i;
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.D = (float)pursuit_d;
+        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.P = rotation_p;
+        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.I = rotation_i;
+        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.D = rotation_d;
+        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.P = pursuit_p;
+        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.I = pursuit_i;
+        DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.D = pursuit_d;
     }
 
     public static void renderRobot(String stroke, Pose pose) {

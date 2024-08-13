@@ -9,9 +9,9 @@ import org.firstinspires.ftc.teamcode.util.DukUtilities;
 
 public class AutonPointTask implements AutonTask {
     public final Pose target;
-    private final float tolerance;
+    private final double tolerance;
 
-    public AutonPointTask(Pose _target, float _tolerance) {
+    public AutonPointTask(Pose _target, double _tolerance) {
         target = _target;
         tolerance = _tolerance + DukConstants.AUTOMATED_CONTROLLER_PARAMS.STANDARD_PURSUIT_RANGE;
     }

@@ -22,7 +22,7 @@ public class OdometerWheels implements CachedSubsystem {
     public int yLastLeftET;
     public int yLastRightET;
     public int xLastET;
-    public float totalDeltaET;
+    public double totalDeltaET;
 
     public Pose pose = new Pose(DukConstants.HARDWARE.ODOMETER_CENTER);
     public Vector delta;
@@ -68,7 +68,7 @@ public class OdometerWheels implements CachedSubsystem {
         updatePositionDelta();
         pose.pos.add(delta);
         pose.vel = new Vector(delta);
-        pose.vel.scale(1 / (float)TimeManager.getDeltaTime());
+        pose.vel.scale(1 / TimeManager.getDeltaTime());
     }
 
     @Override
@@ -97,7 +97,7 @@ public class OdometerWheels implements CachedSubsystem {
 
     private void updateHeadingDelta() {
         pose.w = (yLeft.getCurrentPosition() - yLastLeftET - yRight.getCurrentPosition() + yLastRightET)
-            * (float)(Math.PI / DukConstants.HARDWARE.ET_PER_ROBOT_REVOLUTION);
+            * (Math.PI / DukConstants.HARDWARE.ET_PER_ROBOT_REVOLUTION);
     }
 
     private void updatePositionDelta() {
@@ -106,7 +106,7 @@ public class OdometerWheels implements CachedSubsystem {
         double averageHeading = pose.getH() - pose.w * 0.5;
         double hSin = Math.sin(averageHeading);
         double hCos = Math.cos(averageHeading);
-        delta = new Vector((float)(hCos * yTicks - hSin * xTicks), (float)(hSin * yTicks + hCos * xTicks));
-        totalDeltaET = (float) (yTicks + xTicks);
+        delta = new Vector((hCos * yTicks - hSin * xTicks), (hSin * yTicks + hCos * xTicks));
+        totalDeltaET =  (yTicks + xTicks);
     }
 }

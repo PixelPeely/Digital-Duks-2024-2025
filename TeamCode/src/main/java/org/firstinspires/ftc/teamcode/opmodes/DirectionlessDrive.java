@@ -21,14 +21,14 @@ public class DirectionlessDrive extends DukOpMode {
     }
 
     private void controlChassis() {
-        float targetHeading = _hardwareMap.driveTrain.targetPose.getH();
+        double targetHeading = _hardwareMap.driveTrain.targetPose.getH();
 
         if (gamepad1Ext.leftJoystick.getR() > DukConstants.INPUT.JOYSTICK_TURN_THRESHOLD)
             targetHeading = gamepad1Ext.leftJoystick.getT();
         if (gamepad1.dpad_up) targetHeading = 0;
-        if (gamepad1.dpad_down) targetHeading = (float)Math.PI;
-        if (gamepad1.dpad_right) targetHeading = (float)Math.PI * 0.5f;
-        if (gamepad1.dpad_left) targetHeading = -(float)Math.PI * 0.5f;
+        if (gamepad1.dpad_down) targetHeading = Math.PI;
+        if (gamepad1.dpad_right) targetHeading = Math.PI * 0.5f;
+        if (gamepad1.dpad_left) targetHeading = -Math.PI * 0.5f;
 
         if (gamepad1.right_bumper || gamepad1.left_bumper)
             targetHeading = targetHeading + (gamepad1.right_bumper ? DukConstants.INPUT.MANUAL_TURN_CONTROL_MULTIPLIER : -DukConstants.INPUT.MANUAL_TURN_CONTROL_MULTIPLIER);

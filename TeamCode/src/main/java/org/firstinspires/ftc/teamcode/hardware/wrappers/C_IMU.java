@@ -16,7 +16,7 @@ public class C_IMU implements CachedPeripheral {
     private final IMU trueImu;
 
     private Orientation orientation = DukConstants.ORIENTATION.NULL_ORIENTATION;
-    private float headingOffset = 0;
+    private double headingOffset = 0;
     private AngularVelocity angularVelocity;
     private YawPitchRollAngles yawPitchRollAngles;
 
@@ -41,13 +41,13 @@ public class C_IMU implements CachedPeripheral {
         Orientation finalOrientation = DukConstants.ORIENTATION.NULL_ORIENTATION;
         finalOrientation.firstAngle = orientation.firstAngle;
         finalOrientation.secondAngle = orientation.secondAngle;
-        finalOrientation.thirdAngle = orientation.thirdAngle - headingOffset;
+        finalOrientation.thirdAngle = orientation.thirdAngle - (float)headingOffset;
         return finalOrientation;
     }
     public AngularVelocity getAngularVelocity() {return angularVelocity;}
     public YawPitchRollAngles getYawPitchRollAngles() {return yawPitchRollAngles;}
 
-    public void setHeading(float heading) {
+    public void setHeading(double heading) {
         refreshCache();
         headingOffset = getOrientation().thirdAngle - heading;
     }

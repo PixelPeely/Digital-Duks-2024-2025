@@ -34,16 +34,16 @@ public class TimeManager {
         tasks.add(task);
     }
 
-    public static void hookFuture(float offset, Predicate<Double> task) {
-        final float scheduleTime = (float)getTime(false);
+    public static void hookFuture(double offset, Predicate<Double> task) {
+        final double scheduleTime = getTime(false);
         //Do not simplify! task.test() must only run when the first condition is met
         //TODO maybe simplifiying is possible since there is no point in checking the second condition if the first is true?
         tasks.add(time -> (time > scheduleTime + offset ? task.test(time) : false));
     }
 
-    public static void hookPeriodic(float interval, Predicate<Double> task) {
+    public static void hookPeriodic(double interval, Predicate<Double> task) {
         AtomicInteger iterations = new AtomicInteger(0);
-        final float scheduleTime = (float)getTime(false);
+        final double scheduleTime = getTime(false);
         tasks.add(time -> {
             if (time > scheduleTime + interval * iterations.get()) {
                 iterations.getAndIncrement();

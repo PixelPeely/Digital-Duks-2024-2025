@@ -70,8 +70,8 @@ public class DriveTrain implements CachedSubsystem {
     }
 
     private void enactTargetVelocity() {
-//        float leftDot = DukConstants.HARDWARE.WHEEL_PAIR_LEFT.dot(targetPose.vel);
-//        float rightDot = DukConstants.HARDWARE.WHEEL_PAIR_RIGHT.dot(targetPose.vel);
+//        double leftDot = DukConstants.HARDWARE.WHEEL_PAIR_LEFT.dot(targetPose.vel);
+//        double rightDot = DukConstants.HARDWARE.WHEEL_PAIR_RIGHT.dot(targetPose.vel);
 //
 //        frontLeft.setPower(leftDot + targetPose.w);
 //        frontRight.setPower(rightDot - targetPose.w);
@@ -104,7 +104,7 @@ public class DriveTrain implements CachedSubsystem {
          */
     }
 
-    private void normalizeMotors(float max) {
+    private void normalizeMotors(double max) {
         AtomicReference<Double> maxValue = new AtomicReference<>((double)0);
         forAllMotors(motor -> maxValue.set(Math.max(maxValue.get(), Math.abs(motor.getPower()))));
         if (maxValue.get() != 0)

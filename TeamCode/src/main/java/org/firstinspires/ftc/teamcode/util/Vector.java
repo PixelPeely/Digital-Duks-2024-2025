@@ -1,17 +1,17 @@
 package org.firstinspires.ftc.teamcode.util;
 
 public class Vector {
-    private float x;
-    private float y;
-    private float r;
-    private float t;
+    private double x;
+    private double y;
+    private double r;
+    private double t;
 
-    public Vector(float _x, float _y) {
+    public Vector(double _x, double _y) {
         setX(_x);
         setY(_y);
     }
 
-    public Vector(float _r, float _t, boolean polar) {
+    public Vector(double _r, double _t, boolean polar) {
         r = _r;
         t = _t;
     }
@@ -24,33 +24,33 @@ public class Vector {
     }
 
     //region Setters and Getteres
-    public float getX() {
-        if (x == 0 && r != 0) x = r * (float)Math.sin(t);
+    public double getX() {
+        if (x == 0 && r != 0) x = r * Math.sin(t);
         return x;
     }
 
-    public void setX(float _x) {
+    public void setX(double _x) {
         x = _x;
         r = t = 0;
     }
 
-    public float getY() {
-        if (y == 0 && r != 0) y = r * (float)Math.cos(t);
+    public double getY() {
+        if (y == 0 && r != 0) y = r * Math.cos(t);
         return y;
     }
 
-    public void setY(float _y) {
+    public void setY(double _y) {
         y = _y;
         r = t = 0;
     }
 
-    public float getR() {
-        if (r == 0 && (x != 0 || y != 0)) r = (float)Math.sqrt(x * x + y * y);
+    public double getR() {
+        if (r == 0 && (x != 0 || y != 0)) r = Math.sqrt(x * x + y * y);
         return r;
     }
 
-    public float getT() {
-        if (t == 0 && (x != 0 || y != 0)) t = (float)Math.atan2(x, y);
+    public double getT() {
+        if (t == 0 && (x != 0 || y != 0)) t = Math.atan2(x, y);
         return t;
     }
     //endregion
@@ -66,21 +66,21 @@ public class Vector {
         setY(getY() - a.getY());
     }
 
-    public void scale(float a) {
+    public void scale(double a) {
         setX(getX() * a);
         setY(getY() * a);
     }
 
-    public float dot(Vector a) {
+    public double dot(Vector a) {
         return getX() * a.getX() + getY() * a.getY();
     }
 
-    public float cross(Vector a) {
+    public double cross(Vector a) {
         return getX() * a.getY() - getY() * a.getX();
     }
     //endregion
 
-    public void rotate(float angle) {
+    public void rotate(double angle) {
         t = DukUtilities.angleWrap(getT() + angle);
         r = getR();
         setX(0);
@@ -92,7 +92,7 @@ public class Vector {
         setY(-getY());
     }
 
-    public float distance(Vector _a) {
+    public double distance(Vector _a) {
         Vector a = new Vector(_a);
         a.subtract(this);
         return a.getR();
