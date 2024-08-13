@@ -43,7 +43,7 @@ public class DukConstants {
         public static final double ET_PER_MM = 4096 / (35 * Math.PI);
         public static final int ET_PER_ROBOT_REVOLUTION = 33292;//Circumference of pivot circle
         //Intersection of parallel center axis with perpendicular axis
-        public static final DukUtilities.Vector ODOMETER_CENTER = new DukUtilities.Vector(0, -1000, true);
+        public static final Vector ODOMETER_CENTER = new Vector(0, -1000);
         public static final double ROBOT_SIZE_IN = 15;
 
     }

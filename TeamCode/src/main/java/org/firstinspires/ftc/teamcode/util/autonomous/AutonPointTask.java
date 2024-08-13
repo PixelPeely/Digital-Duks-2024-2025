@@ -29,11 +29,11 @@ public class AutonPointTask implements AutonTask {
 
     @Override
     public boolean shouldTerminate() {
-        return DukUtilities.getDistance(_hardwareMap.driveTrain.poseEstimator.getPose().x, _hardwareMap.driveTrain.poseEstimator.getPose().y, target.x, target.y)
+        return _hardwareMap.driveTrain.poseEstimator.getPose().pos.distance(target.pos)
                 < tolerance + DukConstants.AUTOMATED_CONTROLLER_PARAMS.STANDARD_PURSUIT_RANGE &&
-                DukUtilities.differenceConstrained(_hardwareMap.driveTrain.poseEstimator.getPose().getH(), target.getH())
+                DukUtilities.wrappedAngleDifference(_hardwareMap.driveTrain.poseEstimator.getPose().getH(), target.getH())
                 < DukConstants.AUTOMATED_CONTROLLER_PARAMS.STANDARD_HEADING_RANGE &&
-                _hardwareMap.driveTrain.poseEstimator.getPose().s < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_SPEED &&
+                _hardwareMap.driveTrain.poseEstimator.getPose().vel.getR() < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_SPEED &&
                 Math.abs(_hardwareMap.driveTrain.poseEstimator.getPose().w) < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_ANGULAR_SPEED;
     }
 

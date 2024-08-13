@@ -7,56 +7,47 @@ import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
+import org.firstinspires.ftc.teamcode.util.Vector;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 public class PoseEstimator implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(PoseEstimator.class.getSimpleName());
+    
     public static class Pose {
-        public float x;
-        public float y;
+        public Vector pos;
+        public Vector vel;
         private float h;
         public float w;
-        public float s;
-        public float vx;
-        public float vy;
 
         public Pose() {}
 
-        public Pose(float _x, float _y) {
-            x = _x;
-            y = _y;
+        public Pose(Vector _pos) {
+            pos = new Vector(_pos);
         }
 
-        public Pose(float _x, float _y, float _h) {
-            x = _x;
-            y = _y;
+        public Pose(Vector _pos, float _h) {
+            pos = new Vector(_pos);
             setH(_h);
         }
 
-        public Pose(float _x, float _y, float _h, float _vx, float _vy, float _w) {
-            x = _x;
-            y = _y;
+        public Pose(Vector _pos, Vector _vel, float _h, float _w) {
+            pos = new Vector(_pos);
+            vel = _vel;
             setH(_h);
-            vx = _vx;
-            vy = _vy;
-            s = (float)Math.sqrt(vx * vx + vy * vy);
             w = _w;
         }
 
         public Pose(Pose pose) {
-            x = pose.x;
-            y = pose.y;
+            pos = new Vector(pose.pos);
+            vel = new Vector(pose.vel);
             h = pose.h;
             w = pose.w;
-            s = pose.s;
-            vx = pose.vx;
-            vy = pose.vy;
         }
 
         public float getH() {return h;}
 
         public void setH(float _h) {
-            h = DukUtilities.constrainAxis(_h);
+            h = DukUtilities.angleWrap(_h);
         }
     }
 
@@ -74,6 +65,7 @@ public class PoseEstimator implements CachedSubsystem {
 //            return false;
 //        });
     }
+    
     public void setPose(Pose _pose) {
         pose = new Pose(_pose);
         Pose wheelPose = new Pose(_pose);
@@ -98,16 +90,13 @@ public class PoseEstimator implements CachedSubsystem {
         Pose wheels = new Pose(odometerWheels.pose);
         DukUtilities.mapPose(odometerWheels.pose.getH(), wheels, DukConstants.HARDWARE.ODOMETER_CENTER, true);
 
-        setPose(new Pose(wheels.x, wheels.y, wheels.getH(),
-                wheels.vx * inverseDelta,
-                wheels.vy * inverseDelta,
-                wheels.w * inverseDelta));
+        setPose(new Pose(wheels.pos, wheels.vel, wheels.getH(), wheels.w * inverseDelta));
     }
 
     @Override
     public void pushTelemetry() {
-        loggingBuffer.push("Pose X", pose.x);
-        loggingBuffer.push("Pose Y", pose.y);
+        loggingBuffer.push("Pose X", pose.pos.getX());
+        loggingBuffer.push("Pose Y", pose.pos.getY());
         loggingBuffer.push("Pose H", pose.getH());
         loggingBuffer.dispatch();
         DashboardInterface.renderRobot(DukConstants.DEBUG.STROKES.ROBOT_POSE_STROKE, pose);

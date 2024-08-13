@@ -1,18 +1,13 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
-import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
-import org.firstinspires.ftc.teamcode.util.DashboardInterface;
-import org.firstinspires.ftc.teamcode.util.GamepadExt;
+import org.firstinspires.ftc.teamcode.hardware.wrappers.GamepadExt;
 import org.firstinspires.ftc.teamcode.util.Logger;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
-
-import java.sql.Time;
 
 public abstract class DukOpMode extends OpMode {
     public DukHardwareMap _hardwareMap;

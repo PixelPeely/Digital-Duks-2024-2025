@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
+import org.firstinspires.ftc.teamcode.util.Vector;
+import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 public class OdometerWheels implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(OdometerWheels.class.getSimpleName());
@@ -22,8 +24,8 @@ public class OdometerWheels implements CachedSubsystem {
     public int xLastET;
     public float totalDeltaET;
 
-    //vx, vy, and w are deltas!
-    public Pose pose = new Pose(DukConstants.HARDWARE.ODOMETER_CENTER.getX(), DukConstants.HARDWARE.ODOMETER_CENTER.getY());
+    public Pose pose = new Pose(DukConstants.HARDWARE.ODOMETER_CENTER);
+    public Vector delta;
 
     public OdometerWheels(HardwareMap hardwareMap) {
         yLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
@@ -64,24 +66,25 @@ public class OdometerWheels implements CachedSubsystem {
         updateHeadingDelta();
         pose.setH(pose.w + pose.getH());
         updatePositionDelta();
-        pose.x += pose.vx;
-        pose.y += pose.vy;
+        pose.pos.add(delta);
+        pose.vel = new Vector(delta);
+        pose.vel.scale(1 / (float)TimeManager.getDeltaTime());
     }
 
     @Override
     public void pushTelemetry() {
         loggingBuffer.push("Heading", pose.getH());
         loggingBuffer.push("Heading Delta", pose.w);
-        loggingBuffer.push("Position X", pose.x);
-        loggingBuffer.push("Position X Delta", pose.vx);
-        loggingBuffer.push("Position Y", pose.y);
-        loggingBuffer.push("Position Y Delta", pose.vy);
+        loggingBuffer.push("Position X", pose.pos.getX());
+        loggingBuffer.push("Position X Delta", delta.getX());
+        loggingBuffer.push("Position Y", pose.pos.getY());
+        loggingBuffer.push("Position Y Delta", delta.getY());
         loggingBuffer.push("yLeft Raw", yLeft.getCurrentPosition());
         loggingBuffer.push("x Raw", x.getCurrentPosition());
         loggingBuffer.push("yRight Raw", yRight.getCurrentPosition());
         loggingBuffer.dispatch();
 
-        DukUtilities.Vector fieldPos = DukUtilities.ETToFieldCoords(pose);
+        Vector fieldPos = DukUtilities.ETToFieldCoords(pose);
         DashboardInterface.bufferPacket.fieldOverlay().setFill(DukConstants.DEBUG.STROKES.ODOMETER_WHEELS_STROKE).fillCircle(fieldPos.getX(), fieldPos.getY(), 1);
     }
 
@@ -103,8 +106,7 @@ public class OdometerWheels implements CachedSubsystem {
         double averageHeading = pose.getH() - pose.w * 0.5;
         double hSin = Math.sin(averageHeading);
         double hCos = Math.cos(averageHeading);
-        pose.vy = (float)(hCos * yTicks - hSin * xTicks);
-        pose.vx = (float)(hSin * yTicks + hCos * xTicks);
+        delta = new Vector((float)(hCos * yTicks - hSin * xTicks), (float)(hSin * yTicks + hCos * xTicks));
         totalDeltaET = (float) (yTicks + xTicks);
     }
 }

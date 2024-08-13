@@ -26,8 +26,8 @@ public class PIDFCalculator {
     }
 
     public float evaluate(float currentState) {
-        float difference = constrainDifference ? DukUtilities.differenceConstrained(target, currentState) : target - currentState;
-        float delta = constrainDifference ? DukUtilities.differenceConstrained(lastState, currentState) : currentState - lastState;
+        float difference = constrainDifference ? DukUtilities.wrappedAngleDifference(target, currentState) : target - currentState;
+        float delta = constrainDifference ? DukUtilities.wrappedAngleDifference(lastState, currentState) : currentState - lastState;
         float p = P * difference;
         float i = I * error;
         float d = D * delta / (float)TimeManager.getDeltaTime();

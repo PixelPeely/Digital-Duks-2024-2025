@@ -59,7 +59,7 @@ public class DashboardInterface {
 
     public static void renderRobot(String stroke, Pose pose) {
         //y=-x, x=y
-        DukUtilities.Vector pos = DukUtilities.ETToFieldCoords(pose);
+        Vector pos = DukUtilities.ETToFieldCoords(pose);
         bufferPacket.fieldOverlay()
                 .setStroke(stroke)
                 .strokeRect(pos.getX() - DukConstants.HARDWARE.ROBOT_SIZE_IN * 0.5,

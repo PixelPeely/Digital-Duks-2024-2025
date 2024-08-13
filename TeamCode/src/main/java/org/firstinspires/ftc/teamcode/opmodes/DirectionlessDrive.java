@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
-import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
+import org.firstinspires.ftc.teamcode.util.Vector;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
@@ -23,8 +23,8 @@ public class DirectionlessDrive extends DukOpMode {
     private void controlChassis() {
         float targetHeading = _hardwareMap.driveTrain.targetPose.getH();
 
-        if (DukUtilities.getJoystickMagnitude(gamepad1, true) > DukConstants.INPUT.JOYSTICK_TURN_THRESHOLD)
-            targetHeading = DukUtilities.getJoystickDirection(gamepad1, true);
+        if (gamepad1Ext.leftJoystick.getR() > DukConstants.INPUT.JOYSTICK_TURN_THRESHOLD)
+            targetHeading = gamepad1Ext.leftJoystick.getT();
         if (gamepad1.dpad_up) targetHeading = 0;
         if (gamepad1.dpad_down) targetHeading = (float)Math.PI;
         if (gamepad1.dpad_right) targetHeading = (float)Math.PI * 0.5f;
@@ -34,13 +34,13 @@ public class DirectionlessDrive extends DukOpMode {
             targetHeading = targetHeading + (gamepad1.right_bumper ? DukConstants.INPUT.MANUAL_TURN_CONTROL_MULTIPLIER : -DukConstants.INPUT.MANUAL_TURN_CONTROL_MULTIPLIER);
 
         _hardwareMap.driveTrain.targetPose.setH(targetHeading);
-        _hardwareMap.driveTrain.displaceVector(new Vector(gamepad1.right_stick_x, -gamepad1.right_stick_y, true), true);
+        _hardwareMap.driveTrain.displaceVector(new Vector(gamepad1.right_stick_x, -gamepad1.right_stick_y), true);
         _hardwareMap.driveTrain.forAllMotors(motor -> motor.setPower(motor.getPower()
                 + (gamepad1.left_trigger - gamepad1.right_trigger) * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER));
     }
 
     private void controlChassisBlind() {
-        _hardwareMap.driveTrain.displaceVector(new Vector(gamepad1.right_stick_x, gamepad1.right_stick_y, true), false);
+        _hardwareMap.driveTrain.displaceVector(new Vector(gamepad1.right_stick_x, -gamepad1.right_stick_y), false);
         _hardwareMap.driveTrain.forAllMotors(motor -> motor.setPower(motor.getPower()
                 + (gamepad1.right_trigger - gamepad1.left_trigger) * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER));
         _hardwareMap.driveTrain.localTurning = gamepad1.left_stick_x + (gamepad1.right_bumper ? 1 : gamepad1.left_bumper ? -1 : 0);

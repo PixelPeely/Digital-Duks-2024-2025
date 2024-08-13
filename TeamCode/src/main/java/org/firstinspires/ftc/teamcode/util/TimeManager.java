@@ -37,6 +37,7 @@ public class TimeManager {
     public static void hookFuture(float offset, Predicate<Double> task) {
         final float scheduleTime = (float)getTime(false);
         //Do not simplify! task.test() must only run when the first condition is met
+        //TODO maybe simplifiying is possible since there is no point in checking the second condition if the first is true?
         tasks.add(time -> (time > scheduleTime + offset ? task.test(time) : false));
     }
 

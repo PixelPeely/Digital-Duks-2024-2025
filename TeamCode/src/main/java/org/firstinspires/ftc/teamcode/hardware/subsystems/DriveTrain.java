@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
-import org.firstinspires.ftc.teamcode.util.DukUtilities.Vector;
+import org.firstinspires.ftc.teamcode.util.Vector;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
@@ -26,7 +26,7 @@ public class DriveTrain implements CachedSubsystem {
     public final C_DcMotor backRight;
     public boolean pursueHeading, pursuePosition;
     public Pose targetPose = new Pose();
-    private Vector localDisplacement = new Vector(0, 0, true);
+    private Vector localDisplacement = new Vector(0, 0);
     public float localTurning = 0;
 
     public DriveTrain(HardwareMap hardwareMap) {
@@ -55,13 +55,10 @@ public class DriveTrain implements CachedSubsystem {
                 localTurning = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(poseEstimator.getPose().getH());
             }
             if (pursuePosition) {
-                float distance = DukUtilities.getDistance(poseEstimator.getPose().x, poseEstimator.getPose().y, targetPose.x, targetPose.y);
-                Vector moveVector = new Vector(
-                        -DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.evaluate(distance),
-                        (float) Math.atan2(targetPose.x - poseEstimator.getPose().x, targetPose.y - poseEstimator.getPose().y),
-                        false
-                );
-                displaceVector(moveVector, true);
+                Vector relativeTargetPos = new Vector(targetPose.pos);
+                relativeTargetPos.subtract(poseEstimator.getPose().pos);
+                relativeTargetPos.scale(-DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.evaluate(relativeTargetPos.getR()));
+                displaceVector(relativeTargetPos, true);
             }
             enactDesiredMovement();
             return false;
@@ -135,8 +132,8 @@ public class DriveTrain implements CachedSubsystem {
         loggingBuffer.push("Front Right", frontRight.getPower());
         loggingBuffer.push("Back Left", backLeft.getPower());
         loggingBuffer.push("Back Right", backRight.getPower());
-        loggingBuffer.push("Pursuit X", targetPose.x);
-        loggingBuffer.push("Pursuit Y", targetPose.y);
+        loggingBuffer.push("Pursuit X", targetPose.pos.getX());
+        loggingBuffer.push("Pursuit Y", targetPose.pos.getY());
         loggingBuffer.dispatch();
 
         DashboardInterface.renderRobot(DukConstants.DEBUG.STROKES.ROBOT_PURSUIT_STROKE, targetPose);
