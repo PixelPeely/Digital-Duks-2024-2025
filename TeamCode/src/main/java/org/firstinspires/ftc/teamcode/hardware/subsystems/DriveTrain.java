@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.Vector;
-import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
@@ -26,8 +25,6 @@ public class DriveTrain implements CachedSubsystem {
     public final C_DcMotor backRight;
     public boolean pursueHeading, pursuePosition;
     public Pose targetPose = new Pose();
-    private Vector localDisplacement = new Vector(0, 0);
-    public float localTurning = 0;
 
     public DriveTrain(HardwareMap hardwareMap) {
         frontLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
@@ -52,7 +49,7 @@ public class DriveTrain implements CachedSubsystem {
         TimeManager.hookTick(t -> {
             if (pursueHeading) {
                 DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.target = targetPose.getH();
-                localTurning = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(poseEstimator.getPose().getH());
+                targetPose.w = DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_ROTATION_PID.evaluate(poseEstimator.getPose().getH());
             }
             if (pursuePosition) {
                 Vector relativeTargetPos = new Vector(targetPose.pos);
@@ -60,7 +57,7 @@ public class DriveTrain implements CachedSubsystem {
                 relativeTargetPos.scale(-DukConstants.AUTOMATED_CONTROLLER_PARAMS.ROBOT_PURSUIT_PID.evaluate(relativeTargetPos.getR()));
                 displaceVector(relativeTargetPos, true);
             }
-            enactDesiredMovement();
+            enactTargetVelocity();
             return false;
         });
     }
@@ -72,47 +69,56 @@ public class DriveTrain implements CachedSubsystem {
         action.accept(backRight);
     }
 
-    private void enactDesiredMovement() {
-        displaceRelative(localDisplacement.getT());
-        applyMagnitude(localDisplacement.getR());
-        turnRelative(localTurning);
+    private void enactTargetVelocity() {
+//        float leftDot = DukConstants.HARDWARE.WHEEL_PAIR_LEFT.dot(targetPose.vel);
+//        float rightDot = DukConstants.HARDWARE.WHEEL_PAIR_RIGHT.dot(targetPose.vel);
+//
+//        frontLeft.setPower(leftDot + targetPose.w);
+//        frontRight.setPower(rightDot - targetPose.w);
+//        backLeft.setPower(rightDot + targetPose.w);
+//        backRight.setPower(leftDot - targetPose.w);
+
+        Vector frontLeftTurn = new Vector(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE);
+        Vector frontRightTurn = new Vector(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE);
+        frontLeftTurn.scale(targetPose.w);
+        frontRightTurn.scale(targetPose.w);
+        Vector backLeftTurn = new Vector(frontRightTurn);
+        Vector backRightTurn = new Vector(frontLeftTurn);
+        frontRightTurn.negate();
+        backRightTurn.negate();
+
+        frontLeftTurn.add(targetPose.vel);
+        frontRightTurn.add(targetPose.vel);
+        backLeftTurn.add(targetPose.vel);
+        backRightTurn.add(targetPose.vel);
+
+        frontLeft.setPower(frontLeftTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
+        frontRight.setPower(frontRightTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
+        backLeft.setPower(backLeftTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
+        backRight.setPower(backRightTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
+
+        normalizeMotors(targetPose.vel.getR());
+        /*
+        a*v+w=(aw+v)*a
+        a_x v_x+a_y v_y+w=(a_x(wa_x+v_x)+a_y(wa_y+v_y))
+         */
     }
 
-    private void displaceRelative(double direction) {
-        direction += Math.PI * 0.25f;
-        double _sin = Math.sin(direction);
-        double _cos = Math.cos(direction);
-        frontLeft.setPower(_sin);
-        backRight.setPower(_sin);
-        frontRight.setPower(_cos);
-        backLeft.setPower(_cos);
+    private void normalizeMotors(float max) {
+        AtomicReference<Double> maxValue = new AtomicReference<>((double)0);
+        forAllMotors(motor -> maxValue.set(Math.max(maxValue.get(), Math.abs(motor.getPower()))));
+        if (maxValue.get() != 0)
+            max /= maxValue.get();
+        final double finalMax = max;
+        forAllMotors(motor -> motor.setPower(motor.getPower() * finalMax));
     }
 
-    private void applyMagnitude(float magnitude) {
-        if (DukConstants.INPUT.MAXIMIZE_MAGNITUDE) {
-            AtomicReference<Double> maxValue = new AtomicReference<>((double)0);
-            forAllMotors(motor -> maxValue.set(Math.max(maxValue.get(), Math.abs(motor.getPower()))));
-            if (maxValue.get() != 0)
-                magnitude /= maxValue.get();
-        }
-        final double finalMagnitude = magnitude;
-        forAllMotors(motor -> motor.setPower(motor.getPower() * finalMagnitude));
+    public void displaceVector(Vector displacement, boolean fieldCentric) {
+        if (fieldCentric) displacement.rotate(-poseEstimator.getPose().getH());
+        targetPose.vel = new Vector(displacement);
     }
 
-    private void turnRelative(double magnitude) {
-        magnitude = DukUtilities.clamp(magnitude, 1, -1);
-        frontLeft.setPower(frontLeft.getPower() - magnitude);
-        backLeft.setPower(backLeft.getPower() - magnitude);
-        frontRight.setPower(frontRight.getPower() + magnitude);
-        backRight.setPower(backRight.getPower() + magnitude);
-    }
-
-    public void displaceVector(Vector displacement, boolean absolute) {
-        if (absolute) displacement.rotate(-poseEstimator.getPose().getH());
-        localDisplacement = displacement;
-    }
-
-    public void stopMotors() {applyMagnitude(0); dispatchAllCaches();}
+    public void stopMotors() {forAllMotors(motor -> motor.setPower(0)); dispatchAllCaches();}
 
     @Override
     public void dispatchAllCaches() {

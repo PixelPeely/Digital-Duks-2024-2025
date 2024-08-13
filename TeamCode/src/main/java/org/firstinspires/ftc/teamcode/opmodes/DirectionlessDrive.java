@@ -43,7 +43,7 @@ public class DirectionlessDrive extends DukOpMode {
         _hardwareMap.driveTrain.displaceVector(new Vector(gamepad1.right_stick_x, -gamepad1.right_stick_y), false);
         _hardwareMap.driveTrain.forAllMotors(motor -> motor.setPower(motor.getPower()
                 + (gamepad1.right_trigger - gamepad1.left_trigger) * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER));
-        _hardwareMap.driveTrain.localTurning = gamepad1.left_stick_x + (gamepad1.right_bumper ? 1 : gamepad1.left_bumper ? -1 : 0);
+        _hardwareMap.driveTrain.targetPose.w = gamepad1.left_stick_x + (gamepad1.right_bumper ? 1 : gamepad1.left_bumper ? -1 : 0);
     }
 
     private void checkSafetySwitch() {

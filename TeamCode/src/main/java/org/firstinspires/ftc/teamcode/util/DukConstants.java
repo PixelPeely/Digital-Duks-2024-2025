@@ -45,7 +45,8 @@ public class DukConstants {
         //Intersection of parallel center axis with perpendicular axis
         public static final Vector ODOMETER_CENTER = new Vector(0, -1000);
         public static final double ROBOT_SIZE_IN = 15;
-
+        public static final Vector LEFT_WHEEL_PAIR_PROFILE = new Vector((float)Math.sqrt(2),(float)Math.sqrt(2));
+        public static final Vector RIGHT_WHEEL_PAIR_PROFILE = new Vector(-(float)Math.sqrt(2),(float)Math.sqrt(2));
     }
 
     public static final class AUTOMATED_CONTROLLER_PARAMS {
