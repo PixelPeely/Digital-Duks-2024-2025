@@ -16,7 +16,7 @@ public class MySuperCoolAutonomous extends DukAutonomous {
             if (_hardwareMap.driveTrain.poseEstimator.getPose().pos.getY() > 1000)
                 return branch(
                         new AutonWaitTask(1),
-                        new AutonPointTask(new Pose(new Vector(0, 0), Math.PI / 2), 0)
+                        new AutonPointTask(new Pose(new Vector(), Math.PI / 2), 0)
                 );
             return branch();
         }));

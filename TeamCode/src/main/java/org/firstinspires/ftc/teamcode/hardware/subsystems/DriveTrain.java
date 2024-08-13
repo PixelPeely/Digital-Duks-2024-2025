@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
+import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.Vector;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
@@ -70,8 +71,8 @@ public class DriveTrain implements CachedSubsystem {
     }
 
     private void enactTargetVelocity() {
-//        double leftDot = DukConstants.HARDWARE.WHEEL_PAIR_LEFT.dot(targetPose.vel);
-//        double rightDot = DukConstants.HARDWARE.WHEEL_PAIR_RIGHT.dot(targetPose.vel);
+//        double leftDot = DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE.dot(targetPose.vel);
+//        double rightDot = DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE.dot(targetPose.vel);
 //
 //        frontLeft.setPower(leftDot + targetPose.w);
 //        frontRight.setPower(rightDot - targetPose.w);
@@ -94,28 +95,25 @@ public class DriveTrain implements CachedSubsystem {
 
         frontLeft.setPower(frontLeftTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
         frontRight.setPower(frontRightTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
-        backLeft.setPower(backLeftTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
-        backRight.setPower(backRightTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
+        backLeft.setPower(backLeftTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
+        backRight.setPower(backRightTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
 
-        normalizeMotors(targetPose.vel.getR());
-        /*
-        a*v+w=(aw+v)*a
-        a_x v_x+a_y v_y+w=(a_x(wa_x+v_x)+a_y(wa_y+v_y))
-         */
+        normalizeMotors();
     }
 
-    private void normalizeMotors(double max) {
+    private void normalizeMotors() {
         AtomicReference<Double> maxValue = new AtomicReference<>((double)0);
         forAllMotors(motor -> maxValue.set(Math.max(maxValue.get(), Math.abs(motor.getPower()))));
-        if (maxValue.get() != 0)
-            max /= maxValue.get();
-        final double finalMax = max;
-        forAllMotors(motor -> motor.setPower(motor.getPower() * finalMax));
+        if (maxValue.get() > 1) {
+            final double multiple = 1 / maxValue.get();
+            forAllMotors(motor -> motor.setPower(motor.getPower() * multiple));
+        }
     }
 
     public void displaceVector(Vector displacement, boolean fieldCentric) {
-        if (fieldCentric) displacement.rotate(-poseEstimator.getPose().getH());
-        targetPose.vel = new Vector(displacement);
+        Vector relativeDisplacement = new Vector(displacement);
+        if (fieldCentric) relativeDisplacement.rotate(-poseEstimator.getPose().getH());
+        targetPose.vel = relativeDisplacement;
     }
 
     public void stopMotors() {forAllMotors(motor -> motor.setPower(0)); dispatchAllCaches();}
@@ -138,8 +136,12 @@ public class DriveTrain implements CachedSubsystem {
         loggingBuffer.push("Front Right", frontRight.getPower());
         loggingBuffer.push("Back Left", backLeft.getPower());
         loggingBuffer.push("Back Right", backRight.getPower());
+        loggingBuffer.push("Velocity X", targetPose.vel.getX());
+        loggingBuffer.push("Velocity Y", targetPose.vel.getY());
         loggingBuffer.push("Pursuit X", targetPose.pos.getX());
         loggingBuffer.push("Pursuit Y", targetPose.pos.getY());
+        loggingBuffer.push("Velocity W", targetPose.w);
+        loggingBuffer.push("Pursuit H", targetPose.getH());
         loggingBuffer.dispatch();
 
         DashboardInterface.renderRobot(DukConstants.DEBUG.STROKES.ROBOT_PURSUIT_STROKE, targetPose);

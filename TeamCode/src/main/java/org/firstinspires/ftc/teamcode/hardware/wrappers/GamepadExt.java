@@ -5,8 +5,11 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 import org.firstinspires.ftc.teamcode.util.Vector;
 
-public class GamepadExt extends Gamepad {
-    private boolean aPressed, bPressed, xPressed, yPressed, backPressed, leftStickPressed;
+public class GamepadExt {
+    private boolean aPressed, bPressed, xPressed, yPressed,
+            rightBumperPressed, leftBumperPressed,
+            dPadUpPressed, dPadRightPressed, dPadDownPressed, dPadLeftPressed,
+            backPressed, leftStickPressed;
     Gamepad base;
     public Vector leftJoystick, rightJoystick;
 
@@ -26,32 +29,68 @@ public class GamepadExt extends Gamepad {
     }
 
     public boolean onBPressed() {
-        boolean newPress = b && !bPressed;
-        bPressed = b;
+        boolean newPress = base.b && !bPressed;
+        bPressed = base.b;
         return newPress;
     }
 
     public boolean onXPressed() {
-        boolean newPress = x && !xPressed;
-        xPressed = x;
+        boolean newPress = base.x && !xPressed;
+        xPressed = base.x;
         return newPress;
     }
 
     public boolean onYPressed() {
-        boolean newPress = y && !yPressed;
-        yPressed = y;
+        boolean newPress = base.y && !yPressed;
+        yPressed = base.y;
         return newPress;
     }
 
     public boolean onBackPressed() {
-        boolean newPress = back && !backPressed;
-        backPressed = back;
+        boolean newPress = base.back && !backPressed;
+        backPressed = base.back;
         return newPress;
     }
 
     public boolean onLeftStickPress() {
-        boolean newPress = left_stick_button && !leftStickPressed;
-        leftStickPressed = left_stick_button;
+        boolean newPress = base.left_stick_button && !leftStickPressed;
+        leftStickPressed = base.left_stick_button;
+        return newPress;
+    }
+
+    public boolean onLeftBumperPressed() {
+        boolean newPress = base.left_bumper && !leftBumperPressed;
+        leftBumperPressed = base.left_bumper;
+        return newPress;
+    }
+
+    public boolean onRightBumperPressed() {
+        boolean newPress = base.right_bumper && !rightBumperPressed;
+        rightBumperPressed = base.right_bumper;
+        return newPress;
+    }
+
+    public boolean onDPadUpPressed() {
+        boolean newPress = base.dpad_up && !dPadUpPressed;
+        dPadUpPressed = base.dpad_up;
+        return newPress;
+    }
+
+    public boolean onDPadRightPressed() {
+        boolean newPress = base.dpad_right && !dPadRightPressed;
+        dPadRightPressed = base.dpad_right;
+        return newPress;
+    }
+
+    public boolean onDPadDownPressed() {
+        boolean newPress = base.dpad_down && !dPadDownPressed;
+        dPadDownPressed = base.dpad_down;
+        return newPress;
+    }
+
+    public boolean onDPadLeftPressed() {
+        boolean newPress = base.dpad_left && !dPadLeftPressed;
+        dPadLeftPressed = base.dpad_left;
         return newPress;
     }
 }

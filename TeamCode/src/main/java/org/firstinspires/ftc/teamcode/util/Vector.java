@@ -6,6 +6,8 @@ public class Vector {
     private double r;
     private double t;
 
+    public Vector() {}
+
     public Vector(double _x, double _y) {
         setX(_x);
         setY(_y);
@@ -83,8 +85,8 @@ public class Vector {
     public void rotate(double angle) {
         t = DukUtilities.angleWrap(getT() + angle);
         r = getR();
-        setX(0);
-        setY(0);
+        x = 0;
+        y = 0;
     }
 
     public void negate() {

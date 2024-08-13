@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
+import org.firstinspires.ftc.teamcode.opmodes.util.SensorSim;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
@@ -25,7 +26,7 @@ public class OdometerWheels implements CachedSubsystem {
     public double totalDeltaET;
 
     public Pose pose = new Pose(DukConstants.HARDWARE.ODOMETER_CENTER);
-    public Vector delta;
+    public Vector delta = new Vector();
 
     public OdometerWheels(HardwareMap hardwareMap) {
         yLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
@@ -68,7 +69,9 @@ public class OdometerWheels implements CachedSubsystem {
         updatePositionDelta();
         pose.pos.add(delta);
         pose.vel = new Vector(delta);
-        pose.vel.scale(1 / TimeManager.getDeltaTime());
+        double timeScale = 1 / TimeManager.getDeltaTime();
+        pose.vel.scale(timeScale);
+        pose.w *= timeScale;
     }
 
     @Override
@@ -106,7 +109,7 @@ public class OdometerWheels implements CachedSubsystem {
         double averageHeading = pose.getH() - pose.w * 0.5;
         double hSin = Math.sin(averageHeading);
         double hCos = Math.cos(averageHeading);
-        delta = new Vector((hCos * yTicks - hSin * xTicks), (hSin * yTicks + hCos * xTicks));
-        totalDeltaET =  (yTicks + xTicks);
+        delta = new Vector(hSin * yTicks + hCos * xTicks, hCos * yTicks - hSin * xTicks);
+        totalDeltaET = (yTicks + xTicks);
     }
 }

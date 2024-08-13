@@ -7,6 +7,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.hardware.CachedPeripheral;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 public class C_DcMotor implements CachedPeripheral {
     public final DcMotorEx trueDcMotor;
@@ -23,6 +24,7 @@ public class C_DcMotor implements CachedPeripheral {
     public boolean[] toRefresh = new boolean[7];
     public boolean invertRefresh = false;
     private boolean allowDispatch = true;
+    public Consumer<C_DcMotor> simRoutine = null;
 
     public C_DcMotor(DcMotorEx dcMotor) {
         if (dcMotor == null) System.out.println("C_DcMotor is null, running as dummy!");
@@ -54,6 +56,9 @@ public class C_DcMotor implements CachedPeripheral {
         toDispatch[4] = true;
         zeroPowerBehavior = _zeroPowerBehavior;
     }
+    public void C_setCurrentPosition(int position) {
+        currentPosition = position;
+    }
 
     public double getPower() {return power;}
     public DcMotorSimple.Direction getDirection() {return direction;}
@@ -76,14 +81,16 @@ public class C_DcMotor implements CachedPeripheral {
 
     @Override
     public void refreshCache() {
-        if (trueDcMotor == null) return;
-        if (toRefresh[0]) power = trueDcMotor.getPower();
-        if (toRefresh[1]) direction = trueDcMotor.getDirection();
-        if (toRefresh[2]) runMode = trueDcMotor.getMode();
-        if (toRefresh[3]) targetPosition = trueDcMotor.getTargetPosition();
-        if (toRefresh[4]) zeroPowerBehavior = trueDcMotor.getZeroPowerBehavior();
-        if (toRefresh[5]) currentPosition = trueDcMotor.getCurrentPosition();
-        if (toRefresh[6]) current = trueDcMotor.getCurrent(CurrentUnit.AMPS);
+        if (simRoutine == null) {
+            if (trueDcMotor == null) return;
+            if (toRefresh[0]) power = trueDcMotor.getPower();
+            if (toRefresh[1]) direction = trueDcMotor.getDirection();
+            if (toRefresh[2]) runMode = trueDcMotor.getMode();
+            if (toRefresh[3]) targetPosition = trueDcMotor.getTargetPosition();
+            if (toRefresh[4]) zeroPowerBehavior = trueDcMotor.getZeroPowerBehavior();
+            if (toRefresh[5]) currentPosition = trueDcMotor.getCurrentPosition();
+            if (toRefresh[6]) current = trueDcMotor.getCurrent(CurrentUnit.AMPS);
+        } else simRoutine.accept(this);
         Arrays.fill(toDispatch, false);
     }
 

@@ -31,7 +31,7 @@ public class AutonPointTask implements AutonTask {
     public boolean shouldTerminate() {
         return _hardwareMap.driveTrain.poseEstimator.getPose().pos.distance(target.pos)
                 < tolerance + DukConstants.AUTOMATED_CONTROLLER_PARAMS.STANDARD_PURSUIT_RANGE &&
-                DukUtilities.wrappedAngleDifference(_hardwareMap.driveTrain.poseEstimator.getPose().getH(), target.getH())
+                DukUtilities.wrappedAngleDifference(target.getH(), _hardwareMap.driveTrain.poseEstimator.getPose().getH())
                 < DukConstants.AUTOMATED_CONTROLLER_PARAMS.STANDARD_HEADING_RANGE &&
                 _hardwareMap.driveTrain.poseEstimator.getPose().vel.getR() < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_SPEED &&
                 Math.abs(_hardwareMap.driveTrain.poseEstimator.getPose().w) < DukConstants.AUTOMATED_CONTROLLER_PARAMS.MAX_PURSUIT_ANGULAR_SPEED;

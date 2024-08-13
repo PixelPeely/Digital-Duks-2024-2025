@@ -15,10 +15,14 @@ public class DukUtilities {
         return (result == a ? a : result < 0 ? result + Math.PI : result > 0 ? result - Math.PI : 0);
     }
 
+
+    /**
+     * @return The signed distance from b to a
+     */
     public static double wrappedAngleDifference(double a, double b) {
         double distance = angleWrap(b-a);
         double inverse_distance = angleWrap(a-b);
-        return -(Math.abs(distance) < Math.abs(inverse_distance) ? distance : inverse_distance);
+        return Math.abs(distance) < Math.abs(inverse_distance) ? distance : inverse_distance;
     }
 
     public static double clamp(double value, double max, double min) {
@@ -42,13 +46,6 @@ public class DukUtilities {
 
     public static double servoPositionToRotation(double position, double offset, double scaleLow, double scaleHigh) {
         return scaleLow + (position - offset) * 2 * Math.PI * Math.abs(scaleLow - scaleHigh);
-    }
-
-    public static void mapPose(double heading, Pose toMap, Vector offset, boolean toGlobal) {
-        Vector _offset = new Vector(offset);
-        _offset.rotate(heading);
-        if (toGlobal) _offset.negate();
-        toMap.pos.add(_offset);
     }
 
     public static Vector ETToFieldCoords(Pose pose) {

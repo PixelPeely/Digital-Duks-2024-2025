@@ -38,6 +38,7 @@ public abstract class DukOpMode extends OpMode {
         postTick();
         _hardwareMap.dispatchAll();
         telemetry.addData("OpMode Loop Time (ms)", TimeManager.getDeltaTime() * 1000);
+        telemetry.update();
     }
 
     @Override
