@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import org.firstinspires.ftc.teamcode.util.Logger;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonTask;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonBranchTask;
@@ -26,6 +27,7 @@ public abstract class DukAutonomous extends DukOpMode{
     @Override
     public void preTick() {
         if (tasks.size() == 0) {
+            Logger.addEntry(new Logger.LogEntry("Task list empty; requesting OpMode stop", Logger.LOG_TYPE.INFO));
             requestOpModeStop();
             return;
         }
@@ -51,12 +53,15 @@ public abstract class DukAutonomous extends DukOpMode{
 
     private void executeTask(AutonTask task) {
         if (task.shouldTerminate()) {
+            Logger.addEntry(new Logger.LogEntry("Terminated " + task.getClass().getSimpleName(), Logger.LOG_TYPE.INFO));
             task.onTerminate();
             tasks.remove(task);
 
             if (task instanceof AutonBranchTask)
-                for (AutonTask resolvedTask : ((AutonBranchTask) task).resolve())
+                for (AutonTask resolvedTask : ((AutonBranchTask) task).resolve()) {
                     tasks.offerFirst(resolvedTask);
+                    Logger.addEntry(new Logger.LogEntry("\tEnqueuing " + resolvedTask.getClass().getSimpleName(), Logger.LOG_TYPE.INFO));
+                }
 
             synchronousTasks.remove(task);
             if (tasks.size() > 0)

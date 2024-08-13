@@ -82,8 +82,6 @@ public class DuplexIMU implements CachedSubsystem {
 
     @Override
     public void pushTelemetry() {
-        if (!DukConstants.DEBUG.USE_FTC_DASHBOARD) return;
-
         loggingBuffer.push("Control Hub Y", imuHub.getOrientation().secondAngle);
         loggingBuffer.push("Control Hub Z", imuHub.getOrientation().thirdAngle);
         loggingBuffer.push("Control Hub X", imuHub.getOrientation().firstAngle);
