@@ -71,32 +71,32 @@ public class DriveTrain implements CachedSubsystem {
     }
 
     private void enactTargetVelocity() {
-//        double leftDot = DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE.dot(targetPose.vel);
-//        double rightDot = DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE.dot(targetPose.vel);
+        double leftDot = DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE.dot(targetPose.vel);
+        double rightDot = DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE.dot(targetPose.vel);
+
+        frontLeft.setPower(leftDot + targetPose.w);
+        frontRight.setPower(rightDot - targetPose.w);
+        backLeft.setPower(rightDot + targetPose.w);
+        backRight.setPower(leftDot - targetPose.w);
+
+//        Vector frontLeftTurn = new Vector(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE);
+//        Vector frontRightTurn = new Vector(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE);
+//        frontLeftTurn.scale(targetPose.w);
+//        frontRightTurn.scale(targetPose.w);
+//        Vector backLeftTurn = new Vector(frontRightTurn);
+//        Vector backRightTurn = new Vector(frontLeftTurn);
+//        frontRightTurn.negate();
+//        backRightTurn.negate();
 //
-//        frontLeft.setPower(leftDot + targetPose.w);
-//        frontRight.setPower(rightDot - targetPose.w);
-//        backLeft.setPower(rightDot + targetPose.w);
-//        backRight.setPower(leftDot - targetPose.w);
-
-        Vector frontLeftTurn = new Vector(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE);
-        Vector frontRightTurn = new Vector(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE);
-        frontLeftTurn.scale(targetPose.w);
-        frontRightTurn.scale(targetPose.w);
-        Vector backLeftTurn = new Vector(frontRightTurn);
-        Vector backRightTurn = new Vector(frontLeftTurn);
-        frontRightTurn.negate();
-        backRightTurn.negate();
-
-        frontLeftTurn.add(targetPose.vel);
-        frontRightTurn.add(targetPose.vel);
-        backLeftTurn.add(targetPose.vel);
-        backRightTurn.add(targetPose.vel);
-
-        frontLeft.setPower(frontLeftTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
-        frontRight.setPower(frontRightTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
-        backLeft.setPower(backLeftTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
-        backRight.setPower(backRightTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
+//        frontLeftTurn.add(targetPose.vel);
+//        frontRightTurn.add(targetPose.vel);
+//        backLeftTurn.add(targetPose.vel);
+//        backRightTurn.add(targetPose.vel);
+//
+//        frontLeft.setPower(frontLeftTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
+//        frontRight.setPower(frontRightTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
+//        backLeft.setPower(backLeftTurn.dot(DukConstants.HARDWARE.RIGHT_WHEEL_PAIR_PROFILE));
+//        backRight.setPower(backRightTurn.dot(DukConstants.HARDWARE.LEFT_WHEEL_PAIR_PROFILE));
 
         normalizeMotors();
     }

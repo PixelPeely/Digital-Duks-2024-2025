@@ -93,4 +93,8 @@ public class GamepadExt {
         dPadLeftPressed = base.dpad_left;
         return newPress;
     }
+
+    public float getTriggerDifference() {
+        return base.right_trigger - base.left_trigger;
+    }
 }

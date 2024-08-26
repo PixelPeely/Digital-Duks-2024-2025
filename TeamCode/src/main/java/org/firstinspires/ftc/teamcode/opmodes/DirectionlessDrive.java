@@ -35,14 +35,12 @@ public class DirectionlessDrive extends DukOpMode {
 
         _hardwareMap.driveTrain.targetPose.setH(targetHeading);
         _hardwareMap.driveTrain.displaceVector(gamepad1Ext.rightJoystick, true);
-        _hardwareMap.driveTrain.forAllMotors(motor -> motor.setPower(motor.getPower()
-                + (gamepad1.left_trigger - gamepad1.right_trigger) * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER));
+        _hardwareMap.driveTrain.targetPose.vel.add(new Vector(gamepad1Ext.getTriggerDifference() * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER, 0));
     }
 
     private void controlChassisBlind() {
         _hardwareMap.driveTrain.displaceVector(gamepad1Ext.rightJoystick, false);
-        _hardwareMap.driveTrain.forAllMotors(motor -> motor.setPower(motor.getPower()
-                + (gamepad1.right_trigger - gamepad1.left_trigger) * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER));
+        _hardwareMap.driveTrain.targetPose.vel.add(new Vector(gamepad1Ext.getTriggerDifference() * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER, 0));
         _hardwareMap.driveTrain.targetPose.w = gamepad1.left_stick_x + (gamepad1.right_bumper ? 1 : gamepad1.left_bumper ? -1 : 0);
     }
 
