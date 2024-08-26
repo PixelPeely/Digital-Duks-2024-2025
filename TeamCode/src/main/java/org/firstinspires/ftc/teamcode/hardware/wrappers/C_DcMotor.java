@@ -27,10 +27,12 @@ public class C_DcMotor implements CachedPeripheral {
     public Consumer<C_DcMotor> simRoutine = null;
 
     public C_DcMotor(DcMotorEx dcMotor) {
+        //TODO move this notification elsewhere (loop over all hardware to see what's valid)
         if (dcMotor == null) System.out.println("C_DcMotor is null, running as dummy!");
         trueDcMotor = dcMotor;
     }
 
+    //region True
     public void setPower(double _power) {
         if (_power == power) return;
         toDispatch[0] = true;
@@ -67,6 +69,7 @@ public class C_DcMotor implements CachedPeripheral {
     public DcMotorEx.ZeroPowerBehavior getZeroPowerBehavior() {return zeroPowerBehavior;}
     public int getCurrentPosition() {return currentPosition * (invertRefresh ? -1:1);}
     public double getCurrent() {return current;}
+    //endregion
 
     @Override
     public void dispatchCache() {
