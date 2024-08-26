@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
@@ -20,6 +21,7 @@ public abstract class DukOpMode extends OpMode {
         gamepad1Ext = new GamepadExt(gamepad1);
         gamepad2Ext = new GamepadExt(gamepad2);
         _hardwareMap = new DukHardwareMap(hardwareMap);
+        _hardwareMap.allHubs.forEach(h -> h.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
         telemetry.addData("Persistent Available", PersistentData.available);
         PersistentData.apply(_hardwareMap);
         _hardwareMap.driveTrain.targetPose = _hardwareMap.driveTrain.poseEstimator.getPose();
@@ -32,6 +34,7 @@ public abstract class DukOpMode extends OpMode {
 
     @Override
     public void loop() {
+        _hardwareMap.allHubs.forEach(LynxModule::clearBulkCache);
         _hardwareMap.refreshAll();
         preTick();
         TimeManager.onTick(time);
