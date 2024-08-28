@@ -46,6 +46,9 @@ public class DukConstants {
         public static final double ROBOT_SIZE_IN = 15;
         public static final Vector LEFT_WHEEL_PAIR_PROFILE = new Vector(Math.sqrt(2),Math.sqrt(2));
         public static final Vector RIGHT_WHEEL_PAIR_PROFILE = new Vector(-Math.sqrt(2),Math.sqrt(2));
+        public static final Vector[] SWERVE_MODULE_POSITIONS = new Vector[] {
+                new Vector(0, 0)
+        };
     }
 
     public static final class AUTOMATED_CONTROLLER_PARAMS {

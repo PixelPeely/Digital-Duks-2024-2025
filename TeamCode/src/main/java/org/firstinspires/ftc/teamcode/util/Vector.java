@@ -99,4 +99,8 @@ public class Vector {
         a.subtract(this);
         return a.getR();
     }
+
+    public void normalize() {
+        this.scale(1 / getR());
+    }
 }

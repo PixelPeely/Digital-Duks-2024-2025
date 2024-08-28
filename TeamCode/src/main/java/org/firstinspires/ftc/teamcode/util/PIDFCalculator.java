@@ -8,13 +8,13 @@ public class PIDFCalculator {
     public double F;
     public double FOffset;
     public double FDividend;
-    public boolean constrainDifference;
+    public boolean wrapDifference;
 
     private double lastState = 0;
     public double target = 0;
     private double error = 0;
 
-    public PIDFCalculator(double p, double i, double i_max, double d, double f, double fOffset, double fDividend, boolean _constrainDifference) {
+    public PIDFCalculator(double p, double i, double i_max, double d, double f, double fOffset, double fDividend, boolean _wrapDifference) {
         P = p;
         I = i;
         I_MAX = i_max;
@@ -22,12 +22,22 @@ public class PIDFCalculator {
         F = f;
         FOffset = fOffset; //Orientation when erect relative to init position
         FDividend = f == 0 ? 1 : fDividend; //Usually ticks per revolution
-        constrainDifference = _constrainDifference;
+        wrapDifference = _wrapDifference;
     }
 
+    //region Alternate constructors
+    public PIDFCalculator(double p, double i, double i_max, double d) {
+        new PIDFCalculator(p, i, i_max, d, 0, 0, 0, false);
+    }
+
+    public PIDFCalculator(double p, double i, double i_max, double d, boolean _wrapDifference) {
+        new PIDFCalculator(p, i, i_max, d, 0, 0, 0, _wrapDifference);
+    }
+    //endregion
+
     public double evaluate(double currentState) {
-        double difference = constrainDifference ? DukUtilities.wrappedAngleDifference(target, currentState) : target - currentState;
-        double delta = constrainDifference ? DukUtilities.wrappedAngleDifference(lastState, currentState) : currentState - lastState;
+        double difference = wrapDifference ? DukUtilities.wrappedAngleDifference(target, currentState) : target - currentState;
+        double delta = wrapDifference ? DukUtilities.wrappedAngleDifference(lastState, currentState) : currentState - lastState;
         double p = P * difference;
         double i = I * error;
         double d = D * delta / TimeManager.getDeltaTime();
