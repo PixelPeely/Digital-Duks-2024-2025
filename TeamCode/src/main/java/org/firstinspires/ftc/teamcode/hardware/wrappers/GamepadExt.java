@@ -9,7 +9,8 @@ public class GamepadExt {
     private boolean aPressed, bPressed, xPressed, yPressed,
             rightBumperPressed, leftBumperPressed,
             dPadUpPressed, dPadRightPressed, dPadDownPressed, dPadLeftPressed,
-            backPressed, leftStickPressed;
+            backPressed,
+            leftStickPressed;
     Gamepad base;
     public Vector leftJoystick, rightJoystick;
 

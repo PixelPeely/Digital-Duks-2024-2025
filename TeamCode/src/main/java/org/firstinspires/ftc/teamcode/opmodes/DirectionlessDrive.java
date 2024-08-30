@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 //C:\Users\jerem\AppData\Local\Android\Sdk\platform-tools
 //adb connect 192.168.43.1:5555
+//./gradlew reloadFastLoad
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -35,7 +36,8 @@ public class DirectionlessDrive extends DukOpMode {
 
         _hardwareMap.driveTrain.targetPose.setH(targetHeading);
         _hardwareMap.driveTrain.displaceVector(gamepad1Ext.rightJoystick, true);
-        _hardwareMap.driveTrain.targetPose.vel.add(new Vector(gamepad1Ext.getTriggerDifference() * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER, 0));
+        _hardwareMap.driveTrain.targetPose.vel.add(new Vector(0, gamepad1Ext.getTriggerDifference() * DukConstants.INPUT.MANUAL_DRIVE_CONTROL_MULTIPLIER));
+        System.out.println(gamepad1Ext.getTriggerDifference());//Not working?
     }
 
     private void controlChassisBlind() {

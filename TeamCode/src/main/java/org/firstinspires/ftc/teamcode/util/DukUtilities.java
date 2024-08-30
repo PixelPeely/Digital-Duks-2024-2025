@@ -7,7 +7,12 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 public class DukUtilities {
 
     public static double angleWrap(double a) {
-        return a - a * Math.round(a / Math.PI);
+        double result = a;
+        while (result > Math.PI)
+            result -= Math.PI;
+        while (result < -Math.PI)
+            result += Math.PI;
+        return (result == a ? a : result < 0 ? result + Math.PI : result > 0 ? result - Math.PI : 0);
     }
 
 

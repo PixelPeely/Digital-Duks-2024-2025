@@ -33,6 +33,7 @@ public class Vector {
 
     public void setX(double _x) {
         x = _x;
+        y = getY();
         r = t = 0;
     }
 
@@ -43,6 +44,7 @@ public class Vector {
 
     public void setY(double _y) {
         y = _y;
+        x = getX();
         r = t = 0;
     }
 
