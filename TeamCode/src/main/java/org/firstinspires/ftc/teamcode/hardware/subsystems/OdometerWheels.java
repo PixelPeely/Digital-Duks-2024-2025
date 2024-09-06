@@ -106,10 +106,26 @@ public class OdometerWheels implements CachedSubsystem {
     private void updatePositionDelta() {
         double yTicks = (yLeft.getCurrentPosition() - yLastLeftET + yRight.getCurrentPosition() - yLastRightET) * 0.5;
         double xTicks = x.getCurrentPosition() - xLastET;
-        double averageHeading = pose.getH() - pose.w * 0.5;
-        double hSin = Math.sin(averageHeading);
-        double hCos = Math.cos(averageHeading);
-        delta = new Vector(hSin * yTicks + hCos * xTicks, hCos * yTicks - hSin * xTicks);
-        totalDeltaET = (yTicks + xTicks);
+//        double averageHeading = pose.getH() - pose.w * 0.5;
+//        double hSin = Math.sin(averageHeading);
+//        double hCos = Math.cos(averageHeading);
+//        delta = new Vector(hSin * yTicks + hCos * xTicks, hCos * yTicks - hSin * xTicks);
+//        totalDeltaET = (yTicks + xTicks);
+        if (pose.getH() == pose.w) {
+            double sin = Math.sin(pose.w);
+            double cos = Math.cos(pose.w);
+            delta = new Vector(sin * yTicks + cos * xTicks, cos * yTicks - sin * xTicks);
+        } else {
+            double sinCurrent = Math.sin(pose.w);
+            double cosCurrent = Math.cos(pose.w);
+            double sinLast = Math.sin(pose.getH());
+            double cosLast = Math.cos(pose.getH());
+            Vector xDelta = new Vector(sinCurrent - sinLast, cosCurrent - cosLast);
+            xDelta.scale(xTicks / (pose.w - pose.getH()));
+            Vector yDelta = new Vector(cosLast - cosCurrent, sinCurrent - sinLast);
+            yDelta.scale(yTicks / (pose.w - pose.getH()));
+            xDelta.add(yDelta);
+            delta = xDelta;
+        }
     }
 }
