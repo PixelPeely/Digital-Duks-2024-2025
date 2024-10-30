@@ -82,6 +82,7 @@ public class DashboardInterface {
         numErrors++;
         TelemetryPacket packet = new TelemetryPacket();
         packet.put("E-" + numErrors + ": " + label, data);
+        Logger.addEntry(new Logger.LogEntry(label, Logger.LOG_TYPE.ERROR));
         dashboard.sendTelemetryPacket(packet);
     }
 }

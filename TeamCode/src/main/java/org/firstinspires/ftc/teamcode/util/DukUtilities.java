@@ -44,10 +44,6 @@ public class DukUtilities {
                 );
     }
 
-    public static double servoPositionToRotation(double position, double offset, double scaleLow, double scaleHigh) {
-        return scaleLow + (position - offset) * 2 * Math.PI * Math.abs(scaleLow - scaleHigh);
-    }
-
     public static Vector ETToFieldCoords(Pose pose) {
         Vector pos = new Vector(pose.pos);
         pos.scale(0.03937f/DukConstants.HARDWARE.ET_PER_MM);
