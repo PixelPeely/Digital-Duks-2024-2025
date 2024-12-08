@@ -4,15 +4,19 @@ import com.qualcomm.robotcore.hardware.AnalogInput;
 
 import org.firstinspires.ftc.teamcode.hardware.CachedPeripheral;
 
+import java.util.function.Consumer;
+
 public class C_AnalogInput implements CachedPeripheral {
     public final AnalogInput trueAnalogInput;
 
     private double scale;
     private final double inverseMaxVoltage;
 
+    public Consumer<C_AnalogInput> simRoutine = null;
+
     public C_AnalogInput(AnalogInput analogInput) {
         trueAnalogInput = analogInput;
-        inverseMaxVoltage = 1.0 / trueAnalogInput.getMaxVoltage();
+        inverseMaxVoltage = analogInput == null ? 0 : 1.0 / trueAnalogInput.getMaxVoltage();
     }
 
     public double getScale() {
@@ -26,7 +30,9 @@ public class C_AnalogInput implements CachedPeripheral {
 
     @Override
     public void refreshCache() {
-        scale = trueAnalogInput.getVoltage() * inverseMaxVoltage;
+        if (simRoutine == null)
+            scale = trueAnalogInput.getVoltage() * inverseMaxVoltage;
+        else simRoutine.accept(this);
     }
 
     @Override

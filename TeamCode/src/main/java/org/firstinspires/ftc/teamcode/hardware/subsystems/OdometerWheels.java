@@ -23,20 +23,19 @@ public class OdometerWheels implements CachedSubsystem {
     public int yLastLeftET;
     public int yLastRightET;
     public int xLastET;
-    public double totalDeltaET;
 
     public Pose pose = new Pose(DukConstants.HARDWARE.ODOMETER_CENTER);
     public Vector delta = new Vector();
 
     public OdometerWheels(HardwareMap hardwareMap) {
-        yLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
-        x = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backLeft"));
-        yRight = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontRight"));
+        yLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "dummyOdometer"));
+        x = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
+        yRight = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backRight"));
 
         //Behavior is initialized in DriveTrain
-        yLeft.invertRefresh = true;
+        yLeft.invertRefresh = false;
         yLeft.toRefresh[5] = true;
-        yRight.invertRefresh = true;
+        yRight.invertRefresh = false;
         yRight.toRefresh[5] = true;
         x.invertRefresh = true;
         x.toRefresh[5] = true;

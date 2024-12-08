@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator;
+import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.Logger;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
+import org.firstinspires.ftc.teamcode.util.Vector;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonTask;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonBranchTask;
 
@@ -36,6 +39,7 @@ public abstract class DukAutonomous extends DukOpMode{
         if (currentTask.runSynchronous()) {
             synchronousTasks.add(currentTask);
             tasks.removeFirst();
+            return;
         }
         executeTask(currentTask);
         synchronousTasks.forEach(this::executeTask);
@@ -79,7 +83,6 @@ public abstract class DukAutonomous extends DukOpMode{
     public void register(AutonTask task) {
         tasks.offerLast(task);
     }
-
 
     /**
      * Short-hand for creating a list to serve as a sequential task branch

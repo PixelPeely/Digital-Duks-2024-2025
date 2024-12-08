@@ -41,7 +41,7 @@ public class PIDFCalculator {
         double p = P * difference;
         double i = I * error;
         double d = D * delta / TimeManager.getDeltaTime();
-        double f = F * -Math.sin((currentState - FOffset) * (2 * Math.PI / FDividend));
+        double f = F * Math.sin((FOffset - currentState) * (2 * Math.PI / FDividend));
 
         lastState = currentState;
         error = DukUtilities.clamp(error + difference, I_MAX, -I_MAX);

@@ -40,20 +40,30 @@ public class DukConstants {
     //Measurements are in encoder ticks
     public static final class HARDWARE {
         public static final double ET_PER_MM = 4096 / (35 * Math.PI);
-        public static final int ET_PER_ROBOT_REVOLUTION = 33292;//Circumference of pivot circle
+        public static final int ET_PER_ROBOT_REVOLUTION = 19500;//Circumference of pivot circle
         //Intersection of parallel center axis with perpendicular axis
         public static final Vector ODOMETER_CENTER = new Vector(0, -45 * ET_PER_MM);
-        public static final double ROBOT_SIZE_IN = 15;
+        public static final double ROBOT_SIZE_IN = 14.5;
         public static final Vector LEFT_WHEEL_PAIR_PROFILE = new Vector(Math.sqrt(2),Math.sqrt(2));
         public static final Vector RIGHT_WHEEL_PAIR_PROFILE = new Vector(-Math.sqrt(2),Math.sqrt(2));
-        public static final Vector[] SWERVE_MODULE_POSITIONS = new Vector[] {
-                new Vector(0, 0)
-        };
+        public static final double EXTENDO_RET_ANGLE = Math.toRadians(85);
+        public static final double EXTENDO_EXT_ANGLE = Math.toRadians(5);
+        public static final double EXTENDO_LINKAGE_LENGTH = -1;
+        public static final double CARRIAGE_RET_ANGLE = Math.toRadians(85);
+        public static final double CARRIAGE_EXT_ANGLE = Math.toRadians(5);
+        public static final double CARRIAGE_LINKAGE_LENGTH = -1;
+        public static final double SUBMERSIBLE_DEAD_LENGTH = -1; //Length when fully retracted
+        public static final int MIN_LIFT_HEIGHT = 10;
+        public static final int MAX_LIFT_HEIGHT = 1000;
+        public static final double CLIP_DISTANCE_TRANSFER = 1000;
+        public static final double DRIVETRAIN_WINCH_RATIO = 29.0/30.0;
     }
 
     public static final class AUTOMATED_CONTROLLER_PARAMS {
-        public static final PIDFCalculator ROBOT_ROTATION_PID = new PIDFCalculator(1.1f, 0.0f, 100, 0.09f, 0, 0, 0, true);
-        public static final PIDFCalculator ROBOT_PURSUIT_PID = new PIDFCalculator(0.0002f, 0f, 100, -0.00003f, 0, 0, 0, false);
+        public static final PIDFCalculator ROBOT_ROTATION_PID = new PIDFCalculator(1.1, 0.0, 100, 0.09, 0, 0, 0, true);
+        public static final PIDFCalculator ROBOT_PURSUIT_PID = new PIDFCalculator(0.0002, 0, 100, -0.00003, 0, 0, 0, false);
+        public static final PIDFCalculator PIVOT_PIDF = new PIDFCalculator(0.01, 0, 100, 0, 0.1, Math.PI, 360, true);//TODO sus FFoffset, test
+        public static final PIDFCalculator LIFT_PIDF = new PIDFCalculator(0.01, 0, 0, 0);
         public static final double STANDARD_PURSUIT_RANGE = 1300;
         public static final double STANDARD_HEADING_RANGE = 0.08f;
         public static final int MAX_PURSUIT_SPEED = 10;

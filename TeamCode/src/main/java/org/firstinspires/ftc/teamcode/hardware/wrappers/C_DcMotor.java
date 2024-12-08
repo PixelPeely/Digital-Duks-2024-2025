@@ -99,6 +99,7 @@ public class C_DcMotor implements CachedPeripheral {
 
     @Override
     public void allowDispatch(boolean state) {
+        System.out.println(state);
         allowDispatch = state;
     }
 

@@ -31,6 +31,7 @@ public class DashboardInterface {
     public static class ComponentDispatching {
         public static void apply(DukHardwareMap hMap) {
             CD_DriveTrain.apply(hMap.driveTrain);
+            System.out.println("lol");
         }
         @Config
         public static class CD_DriveTrain {
