@@ -76,7 +76,7 @@ public class HardLink implements CachedPeripheral {
             else if (l.component instanceof Linkage) _power = ((Linkage) l.component).getLinearPosition();
             sum += _power / l.ratio;
         }
-        return sum;
+        return sum / links.size();
     }
 
     @Override

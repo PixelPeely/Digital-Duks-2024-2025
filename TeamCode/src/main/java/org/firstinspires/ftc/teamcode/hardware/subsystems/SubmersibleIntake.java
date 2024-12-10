@@ -4,39 +4,49 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
+import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.assemblies.HardLink;
 import org.firstinspires.ftc.teamcode.hardware.assemblies.Linkage;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_Servo;
+import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
+import org.firstinspires.ftc.teamcode.util.InternalTaskInstances;
+import org.firstinspires.ftc.teamcode.util.TimeManager;
 import org.firstinspires.ftc.teamcode.util.Vector;
 
 public class SubmersibleIntake implements CachedSubsystem {
+    private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(SubmersibleIntake.class.getSimpleName());
+
     public final Linkage carriage;
     public final Linkage extendo;
     public final Shuttle shuttle;
 
-    private STATE state;
+    private STATE state = STATE.DROP;
+    InternalTaskInstances.SubmersibleIntakeTasks tasks;
+    public Lift.STATE desiredLiftState = Lift.STATE.TRANSFER;
 
     public enum STATE {
-        DROP(1, 0, Shuttle.STATE.RETRACTED),
-        SCOUT(0, 1, Shuttle.STATE.SCOUT),
-        DEPLOYED(0, 1, Shuttle.STATE.DEPLOYED),
-        TRANSFER(0.5, 0, Shuttle.STATE.TRANSFER);
+        DROP(0, 1, Shuttle.STATE.DROP, true),
+        SCOUT(1, 0, Shuttle.STATE.SCOUT, false),
+        TRANSFER(0, 0.5, Shuttle.STATE.TRANSFER, true)
+        ;
 
-        final double carriagePosition, extendoPosition;
-        final Shuttle.STATE shuttleState;
-        STATE(double _carriagePosition, double _extendoPosition, Shuttle.STATE _shuttleState) {
-            carriagePosition = _carriagePosition;
+        public final double extendoPosition, carriagePosition;
+        public final Shuttle.STATE shuttleState;
+        public final boolean closed;
+        STATE(double _extendoPosition, double _carriagePosition, Shuttle.STATE _shuttleState, boolean _closed) {
             extendoPosition = _extendoPosition;
+            carriagePosition = _carriagePosition;
             shuttleState = _shuttleState;
+            closed = _closed;
         }
     }
 
     public SubmersibleIntake(HardwareMap hardwareMap) {
         C_Servo extendoR = new C_Servo(hardwareMap.tryGet(Servo.class, "extendoR"));
         C_Servo extendoL = new C_Servo(hardwareMap.tryGet(Servo.class, "extendoL"));
-        extendoL.setScaleRange(0.8, 0.05);
-        extendoR.setScaleRange(0.2, 0.95);
+        extendoL.setScaleRange(0.05, 0.85);
+        extendoR.setScaleRange(0.95, 0.15);
         extendo = new Linkage(
                 DukConstants.HARDWARE.EXTENDO_RET_ANGLE,
                 DukConstants.HARDWARE.EXTENDO_EXT_ANGLE,
@@ -45,9 +55,10 @@ public class SubmersibleIntake implements CachedSubsystem {
                         new HardLink.Link(extendoL, 1)
                 )
         );
+        extendo.servos.setPower(state.extendoPosition);
 
         C_Servo carriageServo = new C_Servo(hardwareMap.tryGet(Servo.class, "carriage"));
-        carriageServo.setScaleRange(0.2, 0.5);
+        carriageServo.setScaleRange(0.5, 0.3);
         carriage = new Linkage(
                 DukConstants.HARDWARE.CARRIAGE_RET_ANGLE,
                 DukConstants.HARDWARE.CARRIAGE_EXT_ANGLE,
@@ -55,8 +66,11 @@ public class SubmersibleIntake implements CachedSubsystem {
                         new HardLink.Link(carriageServo, 1)
                 )
         );
+        carriage.servos.setPower(state.carriagePosition);
 
         shuttle = new Shuttle(hardwareMap);
+
+        tasks = new InternalTaskInstances.SubmersibleIntakeTasks(this);
     }
 
     public double getLength() {
@@ -71,10 +85,25 @@ public class SubmersibleIntake implements CachedSubsystem {
     }
 
     public void setState(STATE _state) {
+        if (state == _state) return;
+        tasks.cancelAll();
         state = _state;
-        extendo.setLinearPosition(state.extendoPosition);
-        carriage.setLinearPosition(state.carriagePosition);
-        shuttle.setState(state.shuttleState);
+
+        shuttle.setState(_state.closed ? Shuttle.STATE.CARRY : Shuttle.STATE.SLIDE);
+
+        if (DukHardwareMap.InternalInteractions.getLiftPosition() < Lift.STATE.EXTENDO_CLEAR.position - DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_ERROR) {
+            desiredLiftState = DukHardwareMap.InternalInteractions.getLiftState();
+            DukHardwareMap.InternalInteractions.setLiftState(Lift.STATE.EXTENDO_CLEAR);
+            TimeManager.hookTick(tasks.liftClearTask);
+        } else
+            extendoMovement();
+    }
+
+    public void extendoMovement() {
+        double timeOffset = 0.5;
+        TimeManager.hookFuture(timeOffset, tasks.extendoTask);
+        timeOffset += 0.5;
+        TimeManager.hookFuture(timeOffset, tasks.shuttleTask);
     }
 
     public STATE getState() {
@@ -88,7 +117,7 @@ public class SubmersibleIntake implements CachedSubsystem {
         distance -= carriagePosition;
         extendo.setLinearPosition(Math.min(distance / (DukConstants.HARDWARE.EXTENDO_LINKAGE_LENGTH * 2), 1));
 
-        shuttle.setRoll(rotation);
+        //shuttle.setRoll(rotation);
     }
 
     @Override
@@ -107,6 +136,10 @@ public class SubmersibleIntake implements CachedSubsystem {
 
     @Override
     public void pushTelemetry() {
+        loggingBuffer.push("Extendo Position", extendo.servos.getAveragePower());
+        loggingBuffer.push("Carriage Position", carriage.servos.getAveragePower());
+        loggingBuffer.push("State", state.name());
+        loggingBuffer.dispatch();
         shuttle.pushTelemetry();
     }
 

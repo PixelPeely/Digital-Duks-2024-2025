@@ -53,8 +53,8 @@ public class DukConstants {
         public static final double CARRIAGE_EXT_ANGLE = Math.toRadians(5);
         public static final double CARRIAGE_LINKAGE_LENGTH = -1;
         public static final double SUBMERSIBLE_DEAD_LENGTH = -1; //Length when fully retracted
-        public static final int MIN_LIFT_HEIGHT = 10;
-        public static final int MAX_LIFT_HEIGHT = 1000;
+        public static final int MIN_LIFT_HEIGHT = 250;
+        public static final int MAX_LIFT_HEIGHT = 4000;
         public static final double CLIP_DISTANCE_TRANSFER = 1000;
         public static final double DRIVETRAIN_WINCH_RATIO = 29.0/30.0;
     }
@@ -62,11 +62,11 @@ public class DukConstants {
     public static final class AUTOMATED_CONTROLLER_PARAMS {
         public static final PIDFCalculator ROBOT_ROTATION_PID = new PIDFCalculator(1.1, 0.0, 100, 0.09, 0, 0, 0, true);
         public static final PIDFCalculator ROBOT_PURSUIT_PID = new PIDFCalculator(0.0002, 0, 100, -0.00003, 0, 0, 0, false);
-        public static final PIDFCalculator PIVOT_PIDF = new PIDFCalculator(0.01, 0, 100, 0, 0.1, Math.PI, 360, true);//TODO sus FFoffset, test
-        public static final PIDFCalculator LIFT_PIDF = new PIDFCalculator(0.01, 0, 0, 0);
+        public static final PIDFCalculator LIFT_PIDF = new PIDFCalculator(0.005, 0, 0, 0);
         public static final double STANDARD_PURSUIT_RANGE = 1300;
         public static final double STANDARD_HEADING_RANGE = 0.08f;
         public static final int MAX_PURSUIT_SPEED = 10;
         public static final double MAX_PURSUIT_ANGULAR_SPEED = 0.02f;
+        public static final int LIFT_ERROR = 100;
     }
 }

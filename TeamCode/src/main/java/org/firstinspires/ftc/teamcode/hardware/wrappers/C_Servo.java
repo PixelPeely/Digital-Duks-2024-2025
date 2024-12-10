@@ -10,7 +10,7 @@ public class C_Servo implements CachedPeripheral {
     public final Servo trueServo;
 
     private Servo.Direction direction;
-    private double position;
+    private double position = Double.NaN;
     private double[] scaleRange = new double[2];
 
     private double targetPosition;
@@ -37,7 +37,6 @@ public class C_Servo implements CachedPeripheral {
         direction = _direction;
     }
     public void setPosition(double _position) {
-        //_position = Math.abs(invertScaleRange - _position);
         if (_position == position) return;
         toDispatch[1] = true;
         position = _position;
@@ -64,8 +63,8 @@ public class C_Servo implements CachedPeripheral {
     public void dispatchCache() {
         if (trueServo == null || !allowDispatch) return;
         if (toDispatch[0]) trueServo.setDirection(direction);
-        if (toDispatch[1]) trueServo.setPosition(Math.abs(invertScaleRange - position));
         if (toDispatch[2]) trueServo.scaleRange(scaleRange[0], scaleRange[1]);
+        if (toDispatch[1]) trueServo.setPosition(Math.abs(invertScaleRange - position));
         Arrays.fill(toDispatch, false);
     }
 

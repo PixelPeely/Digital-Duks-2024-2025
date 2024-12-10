@@ -12,13 +12,16 @@ public class TimeManager {
     private static double deltaTime = 1;
 
     private static List<Predicate<Double>> tasks = new ArrayList<>();
+    private static List<Predicate<Double>> recentTasks = new ArrayList<>();
 
     //Called at the end of every tick
     public static void onTick(double time) {
         if (currentTime != -1) deltaTime = time - currentTime;
         else initTime = time;
         currentTime = time;
-        tasks.removeIf(task -> task.test(currentTime));
+        tasks.addAll(recentTasks);
+        recentTasks.clear();
+        tasks.removeIf(task -> task.test(getTime(false)));
     }
 
     public static double getTime(boolean includeInit) {
@@ -30,27 +33,31 @@ public class TimeManager {
         return deltaTime;
     }
 
+    //TODO substitute for a command scheduler?
     public static void hookTick(Predicate<Double> task) {
-        tasks.add(task);
+        recentTasks.add(task);
     }
 
     public static void hookFuture(double offset, Predicate<Double> task) {
         final double scheduleTime = getTime(false);
-        //Do not simplify! task.test() must only run when the first condition is met
-        //TODO maybe simplifiying is possible since there is no point in checking the second condition if the first is true?
-        tasks.add(time -> (time > scheduleTime + offset ? task.test(time) : false));
+        recentTasks.add(time -> (time > scheduleTime + offset && task.test(time)));
     }
 
     public static void hookPeriodic(double interval, Predicate<Double> task) {
         AtomicInteger iterations = new AtomicInteger(0);
         final double scheduleTime = getTime(false);
-        tasks.add(time -> {
+        recentTasks.add(time -> {
             if (time > scheduleTime + interval * iterations.get()) {
                 iterations.getAndIncrement();
                 return task.test(time);
             }
             return false;
         });
+    }
+
+    public static void cancelTask(Predicate<Double> task) {
+        tasks.removeIf(t -> t.equals(task));
+        recentTasks.removeIf(t -> t.equals(task));
     }
 
     public static void reset() {

@@ -26,6 +26,8 @@ public class DukHardwareMap {
     public final Lift lift;
     public final SubmersibleIntake submersibleIntake;
 
+    private static DukHardwareMap instance;
+
     public DukHardwareMap(HardwareMap hardwareMap) {
         if (DukConstants.DEBUG.USE_FTC_DASHBOARD) {
             DashboardInterface.dashboard = FtcDashboard.getInstance();
@@ -44,18 +46,22 @@ public class DukHardwareMap {
 
         allHubs = hardwareMap.getAll(LynxModule.class);
         AutonTask.Base._hardwareMap = this;
+
+        instance = this;
     }
 
-    public void facilitateTransfer() {
-        lift.setState(Lift.STATE.TRANSFER);
-        submersibleIntake.setState(SubmersibleIntake.STATE.TRANSFER);
+    public static class InternalInteractions {
+        public static double getLiftPosition() {
+            return instance.lift.winch.getAveragePower();
+        }
 
-        TimeManager.hookTick(t -> {
-            if (lift.winch.getAveragePower() < 0) {
+        public static Lift.STATE getLiftState() {
+            return instance.lift.getState();
+        }
 
-            }
-            return true;
-        });
+        public static void setLiftState(Lift.STATE state) {
+            instance.lift.setState(state);
+        }
     }
 
     public void setClutchState(Clutch.STATE state) {
@@ -81,13 +87,19 @@ public class DukHardwareMap {
 
     public void dispatchAll() {
         driveTrain.dispatchAllCaches();
+        lift.dispatchAllCaches();
+        submersibleIntake.dispatchAllCaches();
     }
 
     public void refreshAll() {
         driveTrain.refreshAllCaches();
+        lift.refreshAllCaches();
+        submersibleIntake.refreshAllCaches();
     }
 
     public void pushTelemetryAll() {
         driveTrain.pushTelemetry();
+        lift.pushTelemetry();
+        submersibleIntake.pushTelemetry();
     }
 }

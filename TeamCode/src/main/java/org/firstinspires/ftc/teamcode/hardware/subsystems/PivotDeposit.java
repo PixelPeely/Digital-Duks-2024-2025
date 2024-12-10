@@ -12,20 +12,23 @@ import org.firstinspires.ftc.teamcode.hardware.wrappers.C_AAEServo;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_AnalogInput;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_CRServo;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_Servo;
+import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 
 public class PivotDeposit implements CachedSubsystem {
+    private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(PivotDeposit.class.getSimpleName());
     public HardLink pivot;
     public Claw claw;
     public C_Servo yaw;
 
+    private STATE state = STATE.DOWN;
     enum STATE {
-        DOWN(0, 0, true),
-        SPECIMEN_DOWN(-Math.PI / 2, 0, true),
-        SPECIMEN_RIGHT(-Math.PI / 2, -1, true),
-        SPECIMEN_LEFT(-Math.PI / 2, 1, true),
-        SAMPLE(Math.toRadians(75), 0, true),
-        TRANSFER(0, 0, false);
+        DOWN(0.45, 0.5, true),
+        SPECIMEN_DOWN(0, 0.5, true),
+        SPECIMEN_RIGHT(0, -0.7, true),
+        SPECIMEN_LEFT(0, 0.7, true),
+        SAMPLE(1, 0.5, true),
+        TRANSFER(0.45, 0.5, false);
 
         final double pivotPosition, yaw;
         final boolean closed;
@@ -39,27 +42,29 @@ public class PivotDeposit implements CachedSubsystem {
     public PivotDeposit(HardwareMap hardwareMap) {
         C_Servo pivotL = new C_Servo(hardwareMap.tryGet(Servo.class, "pivotL"));
         C_Servo pivotR = new C_Servo(hardwareMap.tryGet(Servo.class, "pivotR"));
-
-        pivotL.setScaleRange(1, 0.2);
-        pivotR.setScaleRange(0, 0.8);
-
+        pivotL.setScaleRange(0.9, 0.05);
+        pivotR.setScaleRange(0.1, 0.95);
         pivot = new HardLink(
                 new HardLink.Link(pivotL, 1),
                 new HardLink.Link(pivotR, 1)
         );
+        pivot.setPower(state.pivotPosition);
 
         C_Servo clawServo = new C_Servo(hardwareMap.tryGet(Servo.class, "depositClaw"));
         clawServo.setScaleRange(0.2, 0.7);
         claw = new Claw(clawServo);
+        claw.setState(state.closed);
 
         yaw = new C_Servo(hardwareMap.tryGet(Servo.class, "depositYaw"));
         yaw.setScaleRange(0, 1);
+        yaw.setPosition(state.yaw);
     }
 
-    public void setState(STATE state) {
-        pivot.setPower(state.pivotPosition);
-        claw.setState(state.closed);
-        yaw.setPosition(state.yaw);
+    public void setState(STATE _state) {
+        state = _state;
+        pivot.setPower(_state.pivotPosition);
+        claw.setState(_state.closed);
+        yaw.setPosition(_state.yaw);
     }
 
     @Override
@@ -78,7 +83,10 @@ public class PivotDeposit implements CachedSubsystem {
 
     @Override
     public void pushTelemetry() {
-
+        loggingBuffer.push("Position", pivot.getAveragePower());
+        loggingBuffer.push("Claw Closed", claw.closed);
+        loggingBuffer.push("Yaw ", yaw.getPosition());
+        loggingBuffer.dispatch();
     }
 
     @Override

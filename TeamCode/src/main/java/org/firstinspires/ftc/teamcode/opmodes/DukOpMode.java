@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.GamepadExt;
+import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.Logger;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
@@ -30,6 +31,7 @@ public abstract class DukOpMode extends OpMode {
     @Override
     public void start() {
         TimeManager.onTick(time);
+        _hardwareMap.dispatchAll();
     }
 
     @Override

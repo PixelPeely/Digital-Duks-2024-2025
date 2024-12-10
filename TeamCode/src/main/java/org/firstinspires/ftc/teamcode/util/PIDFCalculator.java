@@ -7,7 +7,7 @@ public class PIDFCalculator {
     public double D;
     public double F;
     public double FOffset;
-    public double FDividend;
+    public final double FDividend;
     public boolean wrapDifference;
 
     private double lastState = 0;
@@ -27,11 +27,25 @@ public class PIDFCalculator {
 
     //region Alternate constructors
     public PIDFCalculator(double p, double i, double i_max, double d) {
-        new PIDFCalculator(p, i, i_max, d, 0, 0, 0, false);
+        P = p;
+        I = i;
+        I_MAX = i_max;
+        D = d;
+        F = 0;
+        FOffset = 0;
+        FDividend = 1;
+        wrapDifference = false;
     }
 
-    public PIDFCalculator(double p, double i, double i_max, double d, boolean _wrapDifference) {
-        new PIDFCalculator(p, i, i_max, d, 0, 0, 0, _wrapDifference);
+    public PIDFCalculator(double p, double i, double i_max, double d, double fDividend, boolean _wrapDifference) {
+        P = p;
+        I = i;
+        I_MAX = i_max;
+        D = d;
+        FDividend = fDividend;
+        F = 0;
+        FOffset = 0;
+        wrapDifference = _wrapDifference;
     }
     //endregion
 
@@ -42,7 +56,6 @@ public class PIDFCalculator {
         double i = I * error;
         double d = D * delta / TimeManager.getDeltaTime();
         double f = F * Math.sin((FOffset - currentState) * (2 * Math.PI / FDividend));
-
         lastState = currentState;
         error = DukUtilities.clamp(error + difference, I_MAX, -I_MAX);
 

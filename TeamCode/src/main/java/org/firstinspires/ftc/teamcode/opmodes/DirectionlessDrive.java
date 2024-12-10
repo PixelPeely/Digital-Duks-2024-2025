@@ -57,14 +57,14 @@ public class DirectionlessDrive extends DukOpMode {
             }
         }
 
-        double shuttleRoll = _hardwareMap.submersibleIntake.shuttle.getRoll();
-        shuttleRoll = DukUtilities.clamp(shuttleRoll + (gamepad1.dpad_right ? 1 : 0) - (gamepad1.dpad_left ? 1 : 0), -Math.PI / 2, Math.PI / 2);
-        _hardwareMap.submersibleIntake.shuttle.setRoll(shuttleRoll);
+        //double shuttleRoll = _hardwareMap.submersibleIntake.shuttle.getRoll();
+        //shuttleRoll = DukUtilities.clamp(shuttleRoll + (gamepad1.dpad_right ? 1 : 0) - (gamepad1.dpad_left ? 1 : 0), -Math.PI / 2, Math.PI / 2);
+        //_hardwareMap.submersibleIntake.shuttle.setRoll(shuttleRoll);
 
         if (gamepad1Ext.onBPressed()) _hardwareMap.submersibleIntake.shuttle.claw.setState(!_hardwareMap.submersibleIntake.shuttle.claw.closed);
-
-        if (gamepad2Ext.onAPressed() && _hardwareMap.submersibleIntake.getState() == SubmersibleIntake.STATE.TRANSFER)
-            _hardwareMap.facilitateTransfer();
+//
+//        if (gamepad2Ext.onAPressed() && _hardwareMap.submersibleIntake.getState() == SubmersibleIntake.STATE.TRANSFER)
+//            _hardwareMap.facilitateTransfer();
     }
 
     public void controlLift() {

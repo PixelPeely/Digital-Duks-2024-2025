@@ -4,7 +4,7 @@ import org.firstinspires.ftc.teamcode.hardware.CachedPeripheral;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_Servo;
 
 public class Linkage implements CachedPeripheral {
-    private final HardLink servos;
+    public final HardLink servos;
 
     private final double retractedAngle;
     private final double extendedAngle;
