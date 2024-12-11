@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.SubmersibleIntake;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
+import org.firstinspires.ftc.teamcode.util.InternalTaskInstances;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 import org.firstinspires.ftc.teamcode.util.Vector;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutonTask;
@@ -48,6 +49,7 @@ public class DukHardwareMap {
         AutonTask.Base._hardwareMap = this;
 
         instance = this;
+        InternalTaskInstances.InternalInteractions.setHardwareMapInstance(this);
     }
 
     public static class InternalInteractions {
@@ -61,6 +63,16 @@ public class DukHardwareMap {
 
         public static void setLiftState(Lift.STATE state) {
             instance.lift.setState(state);
+        }
+
+        public static void extendoClearanceUpdate(boolean retracted) {
+            instance.lift.extendoClearanceUpdate(retracted);
+        }
+
+        public static void attemptTransfer() {
+            if (!instance.lift.canTransfer() || !instance.submersibleIntake.canTransfer()) return;
+            instance.lift.pivotDeposit.claw.setState(true);
+            TimeManager.hookFuture(0.3, InternalTaskInstances.InternalInteractions.intakeRelease);
         }
     }
 

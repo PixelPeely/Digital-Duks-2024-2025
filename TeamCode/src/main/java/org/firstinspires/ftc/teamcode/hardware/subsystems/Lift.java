@@ -10,26 +10,29 @@ import org.firstinspires.ftc.teamcode.hardware.assemblies.HardLink;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
+import org.firstinspires.ftc.teamcode.util.InternalTaskInstances;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 import java.util.function.Predicate;
 
 public class Lift implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(Lift.class.getSimpleName());
+    private final InternalTaskInstances.LiftTasks tasks;
 
     public PivotDeposit pivotDeposit;
     public HardLink winch;
     private final C_DcMotor liftR, liftL;
 
-    private Predicate<Double> runningTask = null;
     private STATE state = STATE.DOWN;
+    private STATE desiredState;
+    private boolean extendoRetracted = true;
 
     public enum STATE {
         DOWN(0, PivotDeposit.STATE.DOWN),
         TRANSFER(0, PivotDeposit.STATE.TRANSFER),
-        LOW_SPECIMEN(0.2, PivotDeposit.STATE.SPECIMEN_DOWN),
+        LOW_SPECIMEN(0.45, PivotDeposit.STATE.SPECIMEN_DOWN),
         HIGH_SPECIMEN(0.8, PivotDeposit.STATE.SPECIMEN_DOWN),
-        LOW_SAMPLE(0.3, PivotDeposit.STATE.SAMPLE),
+        LOW_SAMPLE(0.5, PivotDeposit.STATE.SAMPLE),
         HIGH_SAMPLE(0.9, PivotDeposit.STATE.SAMPLE),
         EXTENDO_CLEAR(0.4, PivotDeposit.STATE.DOWN),
         ;
@@ -65,28 +68,46 @@ public class Lift implements CachedSubsystem {
             winch.setPower(DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PIDF.evaluate(winch.getAveragePower()));
             return false;
         });
+
+        tasks = new InternalTaskInstances.LiftTasks(this);
     }
 
     public void setState(STATE _state) {
+        desiredState = _state;
+        if (desiredState.position < STATE.EXTENDO_CLEAR.position && !extendoRetracted) return;
+
         if (state == _state) return;
         state = _state;
+        tasks.cancelAll();
         DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PIDF.target = _state.position;
 
-        if (runningTask != null) TimeManager.cancelTask(runningTask);
         pivotDeposit.claw.setState(state.pivotState.closed);
         pivotDeposit.yaw.setPosition(state.pivotState.yaw);
-        runningTask = t -> {
-            if (winch.getAveragePower() > 800) {
-                pivotDeposit.setState(state.pivotState);
-                return true;
-            }
-            return false;
-        };
-        TimeManager.hookTick(runningTask);
+        TimeManager.hookTick(tasks.setPivotState);
+
+        if (state == STATE.TRANSFER) TimeManager.hookTick(tasks.requestTransfer);
     }
 
     public STATE getState() {
         return state;
+    }
+
+    public boolean canTransfer() {
+        return getState() == STATE.TRANSFER
+                && Math.abs(winch.getAveragePower() - STATE.TRANSFER.position) < DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_ERROR;
+    }
+
+    public void extendoClearanceUpdate(boolean retracted) {
+        if (retracted == extendoRetracted) return;
+        extendoRetracted = retracted;
+
+        if (retracted)
+            setState(desiredState);
+        else if (getState().position < STATE.EXTENDO_CLEAR.position) {
+            STATE currentState = getState();
+            setState(STATE.EXTENDO_CLEAR);
+            desiredState = currentState;
+        }
     }
 
     public void resetEncoders() {

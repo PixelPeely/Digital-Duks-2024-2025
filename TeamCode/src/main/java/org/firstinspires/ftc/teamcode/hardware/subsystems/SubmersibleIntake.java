@@ -22,11 +22,11 @@ public class SubmersibleIntake implements CachedSubsystem {
     public final Shuttle shuttle;
 
     private STATE state = STATE.DROP;
+    public boolean extendoBusy;
     InternalTaskInstances.SubmersibleIntakeTasks tasks;
-    public Lift.STATE desiredLiftState = Lift.STATE.TRANSFER;
 
     public enum STATE {
-        DROP(0, 1, Shuttle.STATE.DROP, true),
+        DROP(0, 0.5, Shuttle.STATE.DROP, true),
         SCOUT(1, 0, Shuttle.STATE.SCOUT, false),
         TRANSFER(0, 0.5, Shuttle.STATE.TRANSFER, true)
         ;
@@ -90,17 +90,21 @@ public class SubmersibleIntake implements CachedSubsystem {
         state = _state;
 
         shuttle.setState(_state.closed ? Shuttle.STATE.CARRY : Shuttle.STATE.SLIDE);
+        if (_state.extendoPosition != 0)
+            DukHardwareMap.InternalInteractions.extendoClearanceUpdate(false);
 
-        if (DukHardwareMap.InternalInteractions.getLiftPosition() < Lift.STATE.EXTENDO_CLEAR.position - DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_ERROR) {
-            desiredLiftState = DukHardwareMap.InternalInteractions.getLiftState();
-            DukHardwareMap.InternalInteractions.setLiftState(Lift.STATE.EXTENDO_CLEAR);
-            TimeManager.hookTick(tasks.liftClearTask);
-        } else
-            extendoMovement();
+        TimeManager.hookTick(tasks.liftClearTask);
+    }
+
+    public boolean canTransfer() {
+        return getState() == STATE.TRANSFER
+                && !extendoBusy;
     }
 
     public void extendoMovement() {
-        double timeOffset = 0.5;
+        extendoBusy = true;
+        double timeOffset = DukHardwareMap.InternalInteractions.getLiftPosition() < Lift.STATE.EXTENDO_CLEAR.position - DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_ERROR ?
+                0.5 : 0;
         TimeManager.hookFuture(timeOffset, tasks.extendoTask);
         timeOffset += 0.5;
         TimeManager.hookFuture(timeOffset, tasks.shuttleTask);
