@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
-import org.firstinspires.ftc.teamcode.opmodes.util.SensorSim;
 import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
@@ -14,8 +13,8 @@ import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.Vector;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
-public class OdometerWheels implements CachedSubsystem {
-    private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(OdometerWheels.class.getSimpleName());
+public class DeadWheelLocalizer implements CachedSubsystem {
+    private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(DeadWheelLocalizer.class.getSimpleName());
     public final C_DcMotor yLeft;
     public final C_DcMotor yRight;
     public final C_DcMotor x;
@@ -27,17 +26,17 @@ public class OdometerWheels implements CachedSubsystem {
     public Pose pose = new Pose(DukConstants.HARDWARE.ODOMETER_CENTER);
     public Vector delta = new Vector();
 
-    public OdometerWheels(HardwareMap hardwareMap) {
-        yLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "dummyOdometer"));
-        x = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "frontLeft"));
+    public DeadWheelLocalizer(HardwareMap hardwareMap) {
+        yLeft = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backLeft"));
+        x = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "dummyOdometer"));
         yRight = new C_DcMotor(hardwareMap.tryGet(DcMotorEx.class, "backRight"));
 
         //Behavior is initialized in DriveTrain
-        yLeft.invertRefresh = false;
-        yLeft.toRefresh[5] = true;
+        yLeft.invertRefresh = true;
         yRight.invertRefresh = false;
+        x.invertRefresh = false;
+        yLeft.toRefresh[5] = true;
         yRight.toRefresh[5] = true;
-        x.invertRefresh = true;
         x.toRefresh[5] = true;
         yLeft.refreshCache();
         yRight.refreshCache();
@@ -68,9 +67,8 @@ public class OdometerWheels implements CachedSubsystem {
         updatePositionDelta();
         pose.pos.add(delta);
         pose.vel = new Vector(delta);
-        double timeScale = 1 / TimeManager.getDeltaTime();
-        pose.vel.scale(timeScale);
-        pose.w *= timeScale;
+        pose.vel.scale(1 / TimeManager.getDeltaTime());
+        pose.w /= TimeManager.getDeltaTime();
     }
 
     @Override
@@ -110,19 +108,20 @@ public class OdometerWheels implements CachedSubsystem {
 //        double hCos = Math.cos(averageHeading);
 //        delta = new Vector(hSin * yTicks + hCos * xTicks, hCos * yTicks - hSin * xTicks);
 //        totalDeltaET = (yTicks + xTicks);
-        if (pose.getH() == pose.w) {
-            double sin = Math.sin(pose.w);
-            double cos = Math.cos(pose.w);
+        if (pose.w == 0) {
+            double midPoint = pose.getH() - 0.5 * pose.w;
+            double sin = Math.sin(midPoint);
+            double cos = Math.cos(midPoint);
             delta = new Vector(sin * yTicks + cos * xTicks, cos * yTicks - sin * xTicks);
         } else {
-            double sinCurrent = Math.sin(pose.w);
-            double cosCurrent = Math.cos(pose.w);
-            double sinLast = Math.sin(pose.getH());
-            double cosLast = Math.cos(pose.getH());
+            double sinCurrent = Math.sin(pose.getH());
+            double cosCurrent = Math.cos(pose.getH());
+            double sinLast = Math.sin(pose.getH() - pose.w);
+            double cosLast = Math.cos(pose.getH() - pose.w);
             Vector xDelta = new Vector(sinCurrent - sinLast, cosCurrent - cosLast);
-            xDelta.scale(xTicks / (pose.w - pose.getH()));
+            xDelta.scale(xTicks / pose.w);
             Vector yDelta = new Vector(cosLast - cosCurrent, sinCurrent - sinLast);
-            yDelta.scale(yTicks / (pose.w - pose.getH()));
+            yDelta.scale(yTicks / pose.w);
             xDelta.add(yDelta);
             delta = xDelta;
         }

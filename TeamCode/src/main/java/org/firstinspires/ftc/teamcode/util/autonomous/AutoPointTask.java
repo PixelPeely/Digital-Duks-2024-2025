@@ -1,17 +1,17 @@
 package org.firstinspires.ftc.teamcode.util.autonomous;
 
 
-import static org.firstinspires.ftc.teamcode.util.autonomous.AutonTask.Base._hardwareMap;
+import static org.firstinspires.ftc.teamcode.util.autonomous.AutoTask.Base._hardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator.Pose;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.DukUtilities;
 
-public class AutonPointTask implements AutonTask {
+public class AutoPointTask implements AutoTask {
     public final Pose target;
     private final double tolerance;
 
-    public AutonPointTask(Pose _target, double _tolerance) {
+    public AutoPointTask(Pose _target, double _tolerance) {
         target = _target;
         tolerance = _tolerance + DukConstants.AUTOMATED_CONTROLLER_PARAMS.STANDARD_PURSUIT_RANGE;
     }

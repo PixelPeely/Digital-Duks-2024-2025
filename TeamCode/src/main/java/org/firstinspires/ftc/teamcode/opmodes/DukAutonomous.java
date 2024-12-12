@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
-import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator;
-import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.Logger;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
-import org.firstinspires.ftc.teamcode.util.Vector;
-import org.firstinspires.ftc.teamcode.util.autonomous.AutonTask;
-import org.firstinspires.ftc.teamcode.util.autonomous.AutonBranchTask;
+import org.firstinspires.ftc.teamcode.util.autonomous.AutoTask;
+import org.firstinspires.ftc.teamcode.util.autonomous.AutoBranchTask;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -15,8 +12,8 @@ import java.util.Deque;
 import java.util.List;
 
 public abstract class DukAutonomous extends DukOpMode{
-    private final Deque<AutonTask> tasks = new ArrayDeque<>();
-    private final List<AutonTask> synchronousTasks = new ArrayList<>();
+    private final Deque<AutoTask> tasks = new ArrayDeque<>();
+    private final List<AutoTask> synchronousTasks = new ArrayList<>();
 
     @Override
     public void init() {
@@ -34,7 +31,7 @@ public abstract class DukAutonomous extends DukOpMode{
             requestOpModeStop();
             return;
         }
-        AutonTask currentTask = tasks.peekFirst();
+        AutoTask currentTask = tasks.peekFirst();
 
         if (currentTask.runSynchronous()) {
             synchronousTasks.add(currentTask);
@@ -55,14 +52,14 @@ public abstract class DukAutonomous extends DukOpMode{
         PersistentData.pose = _hardwareMap.driveTrain.poseEstimator.getPose();
     }
 
-    private void executeTask(AutonTask task) {
+    private void executeTask(AutoTask task) {
         if (task.shouldTerminate()) {
             Logger.addEntry(new Logger.LogEntry("Terminated " + task.getClass().getSimpleName(), Logger.LOG_TYPE.INFO));
             task.onTerminate();
             tasks.remove(task);
 
-            if (task instanceof AutonBranchTask)
-                for (AutonTask resolvedTask : ((AutonBranchTask) task).resolve()) {
+            if (task instanceof AutoBranchTask)
+                for (AutoTask resolvedTask : ((AutoBranchTask) task).resolve()) {
                     tasks.offerFirst(resolvedTask);
                     Logger.addEntry(new Logger.LogEntry("\tEnqueuing " + resolvedTask.getClass().getSimpleName(), Logger.LOG_TYPE.INFO));
                 }
@@ -80,7 +77,7 @@ public abstract class DukAutonomous extends DukOpMode{
      * Enqueue a task for the sequential task executor to run
      * @param task The task to enqueue
      */
-    public void register(AutonTask task) {
+    public void register(AutoTask task) {
         tasks.offerLast(task);
     }
 
@@ -89,7 +86,7 @@ public abstract class DukAutonomous extends DukOpMode{
      * @param tasks Tasks that constitute the branch, in execution order
      * @return A list representing the tasks
      */
-    public List<AutonTask> branch (AutonTask... tasks) {
+    public List<AutoTask> branch (AutoTask... tasks) {
         return Arrays.asList(tasks);
     }
 

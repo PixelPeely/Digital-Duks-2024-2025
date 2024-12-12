@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.util.TimeManager;
 
 public class PoseEstimator implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(PoseEstimator.class.getSimpleName());
-    public final OdometerWheels odometerWheels;
+    public final DeadWheelLocalizer deadWheelLocalizer;
     public final DuplexIMU duplexIMU;
 
     public static class Pose {
@@ -77,7 +77,7 @@ public class PoseEstimator implements CachedSubsystem {
     private Pose pose = new Pose();
 
     public PoseEstimator(HardwareMap hMap) {
-        odometerWheels = new OdometerWheels(hMap);
+        deadWheelLocalizer = new DeadWheelLocalizer(hMap);
         duplexIMU = new DuplexIMU(hMap);
 
 //        TimeManager.hookPeriodic(DukConstants.ORIENTATION.IMU_CHECK_INTERVAL, t -> {
@@ -97,17 +97,17 @@ public class PoseEstimator implements CachedSubsystem {
 
     @Override
     public void dispatchAllCaches() {
-        odometerWheels.dispatchAllCaches();
+        deadWheelLocalizer.dispatchAllCaches();
         duplexIMU.dispatchAllCaches();
     }
 
     @Override
     public void refreshAllCaches() {
-        odometerWheels.refreshAllCaches();
+        deadWheelLocalizer.refreshAllCaches();
         duplexIMU.refreshAllCaches();
 
-        Pose wheels = new Pose(odometerWheels.pose);
-        wheels.spaceTransform(odometerWheels.pose.getH(), DukConstants.HARDWARE.ODOMETER_CENTER, true);
+        Pose wheels = new Pose(deadWheelLocalizer.pose);
+        wheels.spaceTransform(deadWheelLocalizer.pose.getH(), DukConstants.HARDWARE.ODOMETER_CENTER, true);
 
         setPose(new Pose(wheels.pos, wheels.vel, wheels.getH(), wheels.w / TimeManager.getDeltaTime()));
     }
@@ -120,13 +120,13 @@ public class PoseEstimator implements CachedSubsystem {
         loggingBuffer.dispatch();
         DashboardInterface.renderRobot(DukConstants.DEBUG.STROKES.ROBOT_POSE_STROKE, pose);
 
-        odometerWheels.pushTelemetry();
+        deadWheelLocalizer.pushTelemetry();
         duplexIMU.pushTelemetry();
     }
 
     @Override
     public void allowDispatch(boolean state) {
-        odometerWheels.allowDispatch(state);
+        deadWheelLocalizer.allowDispatch(state);
         duplexIMU.allowDispatch(state);
     }
 }

@@ -22,13 +22,14 @@ public class SubmersibleIntake implements CachedSubsystem {
     public final Shuttle shuttle;
 
     private STATE state = STATE.DROP;
+    public STATE delayedState = state;
     public boolean extendoBusy;
     InternalTaskInstances.SubmersibleIntakeTasks tasks;
 
     public enum STATE {
-        DROP(0, 0.5, Shuttle.STATE.DROP, true),
+        DROP(0, 0.35, Shuttle.STATE.DROP, true),
         SCOUT(1, 0, Shuttle.STATE.SCOUT, false),
-        TRANSFER(0, 0.5, Shuttle.STATE.TRANSFER, true)
+        TRANSFER(0, 0.35, Shuttle.STATE.TRANSFER, true)
         ;
 
         public final double extendoPosition, carriagePosition;
@@ -86,6 +87,7 @@ public class SubmersibleIntake implements CachedSubsystem {
 
     public void setState(STATE _state) {
         if (state == _state) return;
+        delayedState = state;
         tasks.cancelAll();
         state = _state;
 
@@ -103,11 +105,14 @@ public class SubmersibleIntake implements CachedSubsystem {
 
     public void extendoMovement() {
         extendoBusy = true;
-        double timeOffset = DukHardwareMap.InternalInteractions.getLiftPosition() < Lift.STATE.EXTENDO_CLEAR.position - DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_ERROR ?
-                0.5 : 0;
+        double timeOffset = 0.5 * shuttle.delayedState.pitch * (1 - 0.5 * getState().extendoPosition);
         TimeManager.hookFuture(timeOffset, tasks.extendoTask);
         timeOffset += 0.5;
         TimeManager.hookFuture(timeOffset, tasks.shuttleTask);
+        TimeManager.hookFuture(timeOffset + Math.max(
+                Math.abs(delayedState.extendoPosition - state.extendoPosition) * 0.5,
+                Math.abs(delayedState.carriagePosition - state.carriagePosition) * 0.2
+        ), tasks.delayedStateTask);
     }
 
     public STATE getState() {

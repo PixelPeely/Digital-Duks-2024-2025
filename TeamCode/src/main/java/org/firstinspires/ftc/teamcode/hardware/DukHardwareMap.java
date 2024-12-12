@@ -14,10 +14,8 @@ import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
 import org.firstinspires.ftc.teamcode.util.InternalTaskInstances;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
-import org.firstinspires.ftc.teamcode.util.Vector;
-import org.firstinspires.ftc.teamcode.util.autonomous.AutonTask;
+import org.firstinspires.ftc.teamcode.util.autonomous.AutoTask;
 
-import java.nio.charset.CharsetDecoder;
 import java.util.List;
 
 public class DukHardwareMap {
@@ -46,7 +44,7 @@ public class DukHardwareMap {
         submersibleIntake = new SubmersibleIntake(hardwareMap);
 
         allHubs = hardwareMap.getAll(LynxModule.class);
-        AutonTask.Base._hardwareMap = this;
+        AutoTask.Base._hardwareMap = this;
 
         instance = this;
         InternalTaskInstances.InternalInteractions.setHardwareMapInstance(this);

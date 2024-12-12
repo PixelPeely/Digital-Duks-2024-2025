@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.util.autonomous;
 
-import static org.firstinspires.ftc.teamcode.util.autonomous.AutonTask.Base._hardwareMap;
+import static org.firstinspires.ftc.teamcode.util.autonomous.AutoTask.Base._hardwareMap;
 
-import org.firstinspires.ftc.teamcode.util.DashboardInterface;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
-public class AutonWaitTask implements AutonTask {
+public class AutoWaitTask implements AutoTask {
     private double waitTime;
 
-    public AutonWaitTask(double _waitTime) {
+    public AutoWaitTask(double _waitTime) {
         waitTime = _waitTime;
     }
 

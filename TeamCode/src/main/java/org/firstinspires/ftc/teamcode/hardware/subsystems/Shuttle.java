@@ -21,6 +21,7 @@ public class Shuttle implements CachedSubsystem {
     public final C_Servo pitch;
 
     private STATE state = STATE.DROP;
+    public STATE delayedState = state;
     private double rollAngle;
 
     public enum STATE {
@@ -45,7 +46,7 @@ public class Shuttle implements CachedSubsystem {
         tasks = new InternalTaskInstances.ShuttleTasks(this);
 
         C_Servo clawServo = new C_Servo(hardwareMap.tryGet(Servo.class, "shuttleClaw"));
-        clawServo.setScaleRange(0.3, 0.5);
+        clawServo.setScaleRange(0.45, 0.65);
         claw = new Claw(clawServo);
         claw.setState(state.closed);
 
@@ -54,19 +55,21 @@ public class Shuttle implements CachedSubsystem {
         roll.setPosition(state.roll);
 
         pitch = new C_Servo(hardwareMap.tryGet(Servo.class, "shuttlePitch"));
-        pitch.setScaleRange(1, 0);
+        pitch.setScaleRange(0.95, 0);
         pitch.setPosition(state.pitch);
     }
 
     public void setState(STATE _state) {
         if (state == _state) return;
-        state = _state;
         tasks.cancelAll();
+        delayedState = state;
+        TimeManager.hookFuture(Math.abs(state.pitch - _state.pitch) * 0.5, tasks.delayedStateTask);
+        state = _state;
 
         pitch.setPosition(_state.pitch);
         if (_state == STATE.PICKUP) {
             claw.setState(false);
-            double timeOffset = 0.25;
+            double timeOffset = 0.75;
             TimeManager.hookFuture(timeOffset, tasks.pickupTask);
             timeOffset += 0.25;
             TimeManager.hookFuture(timeOffset, tasks.carryTask);

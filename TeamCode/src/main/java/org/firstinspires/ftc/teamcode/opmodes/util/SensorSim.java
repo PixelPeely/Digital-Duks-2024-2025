@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmodes.util;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.opmodes.DukOpMode;
-import org.firstinspires.ftc.teamcode.util.DukUtilities;
 
 @TeleOp
 public class SensorSim extends DukOpMode {
@@ -16,9 +14,9 @@ public class SensorSim extends DukOpMode {
     @Override
     public void init() {
         super.init();
-        _hardwareMap.driveTrain.poseEstimator.odometerWheels.yLeft.simRoutine = motor -> motor.C_setCurrentPosition((int)values[0]);
-        _hardwareMap.driveTrain.poseEstimator.odometerWheels.x.simRoutine = motor -> motor.C_setCurrentPosition((int)values[1]);
-        _hardwareMap.driveTrain.poseEstimator.odometerWheels.yRight.simRoutine = motor -> motor.C_setCurrentPosition((int)values[2]);
+        _hardwareMap.driveTrain.poseEstimator.deadWheelLocalizer.yLeft.simRoutine = motor -> motor.C_setCurrentPosition((int)values[0]);
+        _hardwareMap.driveTrain.poseEstimator.deadWheelLocalizer.x.simRoutine = motor -> motor.C_setCurrentPosition((int)values[1]);
+        _hardwareMap.driveTrain.poseEstimator.deadWheelLocalizer.yRight.simRoutine = motor -> motor.C_setCurrentPosition((int)values[2]);
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.hardware.assemblies.HardLink;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
 import org.firstinspires.ftc.teamcode.util.DukConstants;
+import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.InternalTaskInstances;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
@@ -30,10 +31,10 @@ public class Lift implements CachedSubsystem {
     public enum STATE {
         DOWN(0, PivotDeposit.STATE.DOWN),
         TRANSFER(0, PivotDeposit.STATE.TRANSFER),
-        LOW_SPECIMEN(0.45, PivotDeposit.STATE.SPECIMEN_DOWN),
-        HIGH_SPECIMEN(0.8, PivotDeposit.STATE.SPECIMEN_DOWN),
-        LOW_SAMPLE(0.5, PivotDeposit.STATE.SAMPLE),
-        HIGH_SAMPLE(0.9, PivotDeposit.STATE.SAMPLE),
+        LOW_SPECIMEN(0.4, PivotDeposit.STATE.SPECIMEN_DOWN),
+        HIGH_SPECIMEN(0.5, PivotDeposit.STATE.SPECIMEN_DOWN),
+        LOW_SAMPLE(0.4, PivotDeposit.STATE.SAMPLE),
+        HIGH_SAMPLE(0.7, PivotDeposit.STATE.SAMPLE),
         EXTENDO_CLEAR(0.4, PivotDeposit.STATE.DOWN),
         ;
 
@@ -72,6 +73,17 @@ public class Lift implements CachedSubsystem {
         tasks = new InternalTaskInstances.LiftTasks(this);
     }
 
+    public void manualAdjustment(double magnitude) {
+        if (magnitude == 0) return;
+        setLiftPosition(winch.getAveragePower() + magnitude * DukConstants.INPUT.MANUAL_LIFT_SPEED);
+    }
+
+    public void setLiftPosition(double position) {
+        if (!extendoRetracted && position < STATE.EXTENDO_CLEAR.position) return;
+        DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PIDF.target = DukUtilities.clamp(position,
+                DukConstants.HARDWARE.MAX_LIFT_HEIGHT, DukConstants.HARDWARE.MIN_LIFT_HEIGHT);
+    }
+
     public void setState(STATE _state) {
         desiredState = _state;
         if (desiredState.position < STATE.EXTENDO_CLEAR.position && !extendoRetracted) return;
@@ -79,7 +91,7 @@ public class Lift implements CachedSubsystem {
         if (state == _state) return;
         state = _state;
         tasks.cancelAll();
-        DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PIDF.target = _state.position;
+        setLiftPosition(_state.position);
 
         pivotDeposit.claw.setState(state.pivotState.closed);
         pivotDeposit.yaw.setPosition(state.pivotState.yaw);

@@ -22,7 +22,7 @@ public class PivotDeposit implements CachedSubsystem {
     public C_Servo yaw;
 
     private STATE state = STATE.DOWN;
-    enum STATE {
+    public enum STATE {
         DOWN(0.45, 0.5, true),
         SPECIMEN_DOWN(0, 0.5, true),
         SPECIMEN_RIGHT(0, -0.7, true),
@@ -65,6 +65,10 @@ public class PivotDeposit implements CachedSubsystem {
         pivot.setPower(_state.pivotPosition);
         claw.setState(_state.closed);
         yaw.setPosition(_state.yaw);
+    }
+
+    public STATE getState() {
+        return state;
     }
 
     @Override

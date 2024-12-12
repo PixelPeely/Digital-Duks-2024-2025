@@ -26,7 +26,7 @@ public class DukUtilities {
     }
 
     public static double clamp(double value, double max, double min) {
-        if (max < min) System.out.println("DukUtilities.clamp(" + value + ") was called with a max (" + max + ") < min(" + min + ")!");
+        if (max < min) System.out.println("DukUtilities.clamp(" + value + ") was called with a max (" + max + ") < min (" + min + ")!");
         return Math.max(min, Math.min(max, value));
     }
 

@@ -5,6 +5,7 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Shuttle;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.SubmersibleIntake;
 
+import java.sql.Time;
 import java.util.function.Predicate;
 
 public class InternalTaskInstances {
@@ -27,6 +28,7 @@ public class InternalTaskInstances {
         public final Predicate<Double> extendoTask;
         public final Predicate<Double> shuttleTask;
         public final Predicate<Double> liftClearTask;
+        public final Predicate<Double> delayedStateTask;
 
         private final SubmersibleIntake submersibleIntake;
 
@@ -57,18 +59,25 @@ public class InternalTaskInstances {
                 }
                 return false;
             };
+
+            delayedStateTask = t -> {
+                submersibleIntake.delayedState = submersibleIntake.getState();
+                return true;
+            };
         }
 
         public void cancelAll() {
             TimeManager.cancelTask(liftClearTask);
             TimeManager.cancelTask(extendoTask);
             TimeManager.cancelTask(shuttleTask);
+            TimeManager.cancelTask(delayedStateTask);
         }
     }
 
     public static class ShuttleTasks {
         public final Predicate<Double> pickupTask;
         public final Predicate<Double> carryTask;
+        public final Predicate<Double> delayedStateTask;
 
         private final Shuttle shuttle;
 
@@ -84,11 +93,17 @@ public class InternalTaskInstances {
                 shuttle.setState(Shuttle.STATE.CARRY);
                 return true;
             };
+
+            delayedStateTask = t -> {
+                shuttle.delayedState = shuttle.getState();
+                return true;
+            };
         }
 
         public void cancelAll() {
             TimeManager.cancelTask(pickupTask);
             TimeManager.cancelTask(carryTask);
+            TimeManager.cancelTask(delayedStateTask);
         }
     }
 
