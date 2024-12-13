@@ -14,8 +14,6 @@ import org.firstinspires.ftc.teamcode.util.DukUtilities;
 import org.firstinspires.ftc.teamcode.util.InternalTaskInstances;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
-import java.util.function.Predicate;
-
 public class Lift implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(Lift.class.getSimpleName());
     private final InternalTaskInstances.LiftTasks tasks;
@@ -31,10 +29,10 @@ public class Lift implements CachedSubsystem {
     public enum STATE {
         DOWN(0, PivotDeposit.STATE.DOWN),
         TRANSFER(0, PivotDeposit.STATE.TRANSFER),
-        LOW_SPECIMEN(0.4, PivotDeposit.STATE.SPECIMEN_DOWN),
-        HIGH_SPECIMEN(0.5, PivotDeposit.STATE.SPECIMEN_DOWN),
-        LOW_SAMPLE(0.4, PivotDeposit.STATE.SAMPLE),
-        HIGH_SAMPLE(0.7, PivotDeposit.STATE.SAMPLE),
+        LOW_SPECIMEN(0.1, PivotDeposit.STATE.SPECIMEN_DOWN),
+        HIGH_SPECIMEN(0.4, PivotDeposit.STATE.SPECIMEN_DOWN),
+        LOW_SAMPLE(0.4, PivotDeposit.STATE.LOW_SAMPLE),
+        HIGH_SAMPLE(0.9, PivotDeposit.STATE.HIGH_SAMPLE),
         EXTENDO_CLEAR(0.4, PivotDeposit.STATE.DOWN),
         ;
 

@@ -5,7 +5,6 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Shuttle;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.SubmersibleIntake;
 
-import java.sql.Time;
 import java.util.function.Predicate;
 
 public class InternalTaskInstances {
@@ -45,10 +44,8 @@ public class InternalTaskInstances {
                 submersibleIntake.shuttle.setState(submersibleIntake.getState().shuttleState);
                 if (submersibleIntake.getState().extendoPosition == 0)
                     DukHardwareMap.InternalInteractions.extendoClearanceUpdate(true);
-                if (submersibleIntake.getState() == SubmersibleIntake.STATE.TRANSFER) {
-                    submersibleIntake.extendoBusy = false;
+                if (submersibleIntake.getState() == SubmersibleIntake.STATE.TRANSFER)
                     DukHardwareMap.InternalInteractions.attemptTransfer();
-                }
                 return true;
             };
 
@@ -76,7 +73,8 @@ public class InternalTaskInstances {
 
     public static class ShuttleTasks {
         public final Predicate<Double> pickupTask;
-        public final Predicate<Double> carryTask;
+        public final Predicate<Double> pickupCheckTask;
+        public final Predicate<Double> pitchTask;
         public final Predicate<Double> delayedStateTask;
 
         private final Shuttle shuttle;
@@ -89,8 +87,8 @@ public class InternalTaskInstances {
                 return true;
             };
 
-            carryTask = t -> {
-                shuttle.setState(Shuttle.STATE.CARRY);
+            pickupCheckTask = t -> {
+                shuttle.setState(Shuttle.STATE.PICKUP_CHECK);
                 return true;
             };
 
@@ -98,11 +96,16 @@ public class InternalTaskInstances {
                 shuttle.delayedState = shuttle.getState();
                 return true;
             };
+
+            pitchTask = t -> {
+                shuttle.pitch.setPosition(shuttle.getState().pitch);
+                return true;
+            };
         }
 
         public void cancelAll() {
             TimeManager.cancelTask(pickupTask);
-            TimeManager.cancelTask(carryTask);
+            TimeManager.cancelTask(pickupCheckTask);
             TimeManager.cancelTask(delayedStateTask);
         }
     }

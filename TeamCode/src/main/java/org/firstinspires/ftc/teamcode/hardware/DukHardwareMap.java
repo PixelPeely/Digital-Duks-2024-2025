@@ -70,7 +70,7 @@ public class DukHardwareMap {
         public static void attemptTransfer() {
             if (!instance.lift.canTransfer() || !instance.submersibleIntake.canTransfer()) return;
             instance.lift.pivotDeposit.claw.setState(true);
-            TimeManager.hookFuture(0.3, InternalTaskInstances.InternalInteractions.intakeRelease);
+            TimeManager.hookFuture(0.5, InternalTaskInstances.InternalInteractions.intakeRelease);
         }
     }
 
@@ -111,5 +111,12 @@ public class DukHardwareMap {
         driveTrain.pushTelemetry();
         lift.pushTelemetry();
         submersibleIntake.pushTelemetry();
+    }
+
+    public void allowDispatch(boolean state) {
+        driveTrain.allowDispatch(state);
+        clutch.allowDispatch(state);
+        lift.allowDispatch(state);
+        submersibleIntake.allowDispatch(state);
     }
 }

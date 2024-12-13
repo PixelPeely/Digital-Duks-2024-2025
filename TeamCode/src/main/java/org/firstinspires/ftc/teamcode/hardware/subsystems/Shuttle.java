@@ -10,8 +10,6 @@ import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer
 import org.firstinspires.ftc.teamcode.util.InternalTaskInstances;
 import org.firstinspires.ftc.teamcode.util.TimeManager;
 
-import java.sql.Time;
-
 public class Shuttle implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(Shuttle.class.getSimpleName());
     private final InternalTaskInstances.ShuttleTasks tasks;
@@ -31,6 +29,7 @@ public class Shuttle implements CachedSubsystem {
         SCOUT(0.5, 0.6, false),
         TRANSFER(0.5, 0, true),
         PICKUP(-1, 0.8, true),
+        PICKUP_CHECK(-1, 0.6, true),
         ;
 
         public final double roll, pitch;
@@ -66,15 +65,18 @@ public class Shuttle implements CachedSubsystem {
         TimeManager.hookFuture(Math.abs(state.pitch - _state.pitch) * 0.5, tasks.delayedStateTask);
         state = _state;
 
-        pitch.setPosition(_state.pitch);
         if (_state == STATE.PICKUP) {
             claw.setState(false);
-            double timeOffset = 0.75;
+            double timeOffset = 0.5;
+            TimeManager.hookFuture(timeOffset, tasks.pitchTask);
+            timeOffset += 0.75;
             TimeManager.hookFuture(timeOffset, tasks.pickupTask);
             timeOffset += 0.25;
-            TimeManager.hookFuture(timeOffset, tasks.carryTask);
+            TimeManager.hookFuture(timeOffset, tasks.pickupCheckTask);
         } else {
-            roll.setPosition(_state.roll);
+            if (_state != STATE.PICKUP_CHECK)
+                roll.setPosition(_state.roll);
+            pitch.setPosition(_state.pitch);
             claw.setState(_state.closed);
         }
     }
@@ -112,6 +114,7 @@ public class Shuttle implements CachedSubsystem {
         loggingBuffer.push("Roll", roll.getPosition());
         loggingBuffer.push("Pitch", pitch.getPosition());
         loggingBuffer.push("State", state);
+        loggingBuffer.push("Delayed State", delayedState);
         loggingBuffer.dispatch();
     }
 

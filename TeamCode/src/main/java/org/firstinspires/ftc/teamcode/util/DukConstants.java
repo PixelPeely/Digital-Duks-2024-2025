@@ -54,7 +54,7 @@ public class DukConstants {
         public static final double CARRIAGE_EXT_ANGLE = Math.toRadians(5);
         public static final double CARRIAGE_LINKAGE_LENGTH = -1;
         public static final double SUBMERSIBLE_DEAD_LENGTH = -1; //Length when fully retracted
-        public static final int MIN_LIFT_HEIGHT = 330;
+        public static final int MIN_LIFT_HEIGHT = 300;
         public static final int MAX_LIFT_HEIGHT = 4000;
         public static final double CLIP_DISTANCE_TRANSFER = 1000;
         public static final double DRIVETRAIN_WINCH_RATIO = 29.0/30.0;

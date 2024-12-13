@@ -1,19 +1,13 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems;
 
-import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
 import org.firstinspires.ftc.teamcode.hardware.assemblies.Claw;
 import org.firstinspires.ftc.teamcode.hardware.assemblies.HardLink;
-import org.firstinspires.ftc.teamcode.hardware.wrappers.C_AAEServo;
-import org.firstinspires.ftc.teamcode.hardware.wrappers.C_AnalogInput;
-import org.firstinspires.ftc.teamcode.hardware.wrappers.C_CRServo;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_Servo;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
-import org.firstinspires.ftc.teamcode.util.DukConstants;
 
 public class PivotDeposit implements CachedSubsystem {
     private final C_TelemetryLoggingBuffer loggingBuffer = new C_TelemetryLoggingBuffer(PivotDeposit.class.getSimpleName());
@@ -27,7 +21,8 @@ public class PivotDeposit implements CachedSubsystem {
         SPECIMEN_DOWN(0, 0.5, true),
         SPECIMEN_RIGHT(0, -0.7, true),
         SPECIMEN_LEFT(0, 0.7, true),
-        SAMPLE(1, 0.5, true),
+        HIGH_SAMPLE(1, 0.5, true),
+        LOW_SAMPLE(0.85, 0.5, true),
         TRANSFER(0.45, 0.5, false);
 
         final double pivotPosition, yaw;

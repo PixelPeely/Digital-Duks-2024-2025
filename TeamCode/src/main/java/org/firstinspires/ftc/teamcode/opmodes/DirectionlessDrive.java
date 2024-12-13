@@ -30,10 +30,10 @@ public class DirectionlessDrive extends DukOpMode {
 
         if (gamepadExt.leftJoystick.getR() > DukConstants.INPUT.JOYSTICK_TURN_THRESHOLD)
             targetHeading = gamepadExt.leftJoystick.getT();
-        if (gamepad.dpad_up) targetHeading = 0;
-        if (gamepad.dpad_down) targetHeading = Math.PI;
-        if (gamepad.dpad_right) targetHeading = Math.PI * 0.5f;
-        if (gamepad.dpad_left) targetHeading = -Math.PI * 0.5f;
+//        if (gamepad.dpad_up) targetHeading = 0;
+//        if (gamepad.dpad_down) targetHeading = Math.PI;
+//        if (gamepad.dpad_right) targetHeading = Math.PI * 0.5f;
+//        if (gamepad.dpad_left) targetHeading = -Math.PI * 0.5f;
 
         if (gamepad.right_bumper || gamepad.left_bumper)
             targetHeading = targetHeading + (gamepad.right_bumper ? DukConstants.INPUT.MANUAL_TURN_CONTROL_MULTIPLIER : -DukConstants.INPUT.MANUAL_TURN_CONTROL_MULTIPLIER);
@@ -79,9 +79,12 @@ public class DirectionlessDrive extends DukOpMode {
         if (gamepadExt.onYPressed())
             _hardwareMap.submersibleIntake.setState(SubmersibleIntake.STATE.TRANSFER);
 
-        _hardwareMap.submersibleIntake.shuttle.roll.setPosition(
-                DukUtilities.clamp(_hardwareMap.submersibleIntake.shuttle.roll.getPosition() +
-                        (gamepad.dpad_right ? 0 : 0.05) - (gamepad.dpad_left ? 0 : 0.05), 1, 0));
+        double rollDelta = (gamepad.dpad_right ? 0 : 0.01) - (gamepad.dpad_left ? 0 : 0.01);
+        if (rollDelta > 0) {
+            _hardwareMap.submersibleIntake.shuttle.roll.setPosition(
+                    DukUtilities.clamp(_hardwareMap.submersibleIntake.shuttle.roll.getPosition() + rollDelta, 1, 0));
+            _hardwareMap.submersibleIntake.shuttle.claw.closed = false;
+        }
     }
 
     public void controlLift(Gamepad gamepad, GamepadExt gamepadExt) {
