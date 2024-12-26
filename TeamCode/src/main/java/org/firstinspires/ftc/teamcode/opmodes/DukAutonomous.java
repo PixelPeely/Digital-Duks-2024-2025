@@ -4,6 +4,7 @@ import org.firstinspires.ftc.teamcode.util.Logger;
 import org.firstinspires.ftc.teamcode.util.PersistentData;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutoTask;
 import org.firstinspires.ftc.teamcode.util.autonomous.AutoBranchTask;
+import org.firstinspires.ftc.teamcode.util.autonomous.AutoWaitTask;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public abstract class DukAutonomous extends DukOpMode{
     @Override
     public void init() {
         super.init();
+        tasks.add(new AutoWaitTask(0));
         buildAutonomous();
     }
 

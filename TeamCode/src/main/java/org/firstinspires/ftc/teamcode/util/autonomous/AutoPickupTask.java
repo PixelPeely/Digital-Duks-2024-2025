@@ -9,7 +9,6 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.SubmersibleIntake;
 public class AutoPickupTask implements AutoTask {
     private final SubmersibleIntake.STATE endState;
     private final double roll;
-    private boolean hasElement = false;
 
     public AutoPickupTask(SubmersibleIntake.STATE _endState, double _roll) {
         endState = _endState;
@@ -23,19 +22,25 @@ public class AutoPickupTask implements AutoTask {
 
     @Override
     public void execute() {
-        if (_hardwareMap.submersibleIntake.delayedState == SubmersibleIntake.STATE.SCOUT) {
-            _hardwareMap.submersibleIntake.shuttle.roll.setPosition(roll);
-            _hardwareMap.submersibleIntake.shuttle.setState(Shuttle.STATE.PICKUP);
-        }
-        if (_hardwareMap.submersibleIntake.shuttle.delayedState == Shuttle.STATE.CARRY) {
-            hasElement = true;
-            _hardwareMap.submersibleIntake.setState(endState);
+        if (_hardwareMap.submersibleIntake.delayedState != SubmersibleIntake.STATE.SCOUT) return;
+        switch (_hardwareMap.submersibleIntake.shuttle.delayedState) {
+            case SCOUT:
+                _hardwareMap.submersibleIntake.shuttle.roll.setPosition(roll);
+                _hardwareMap.submersibleIntake.shuttle.setState(Shuttle.STATE.DEPLOYED);
+                break;
+            case DEPLOYED:
+                _hardwareMap.submersibleIntake.shuttle.setState(Shuttle.STATE.PICKUP);
+                break;
+            case PICKUP_CHECK:
+                System.out.println("Pickup check complete");
+                _hardwareMap.submersibleIntake.setState(endState);
+                break;
         }
     }
 
     @Override
     public boolean shouldTerminate() {
-        return hasElement && _hardwareMap.submersibleIntake.delayedState == endState;
+        return _hardwareMap.submersibleIntake.shuttle.hasElement && _hardwareMap.submersibleIntake.delayedState == endState;
     }
 
     @Override

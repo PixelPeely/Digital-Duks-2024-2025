@@ -26,9 +26,9 @@ public class SubmersibleIntake implements CachedSubsystem {
     InternalTaskInstances.SubmersibleIntakeTasks tasks;
 
     public enum STATE {
-        DROP(0, 0.25, Shuttle.STATE.DROP, true),
+        DROP(0, 0.5, Shuttle.STATE.DROP, true),
         SCOUT(1, 0, Shuttle.STATE.SCOUT, false),
-        TRANSFER(0, 0.25, Shuttle.STATE.TRANSFER, true)
+        TRANSFER(0, 0.35, Shuttle.STATE.TRANSFER, true)
         ;
 
         public final double extendoPosition, carriagePosition;
@@ -58,7 +58,7 @@ public class SubmersibleIntake implements CachedSubsystem {
         extendo.servos.setPower(state.extendoPosition);
 
         C_Servo carriageServo = new C_Servo(hardwareMap.tryGet(Servo.class, "carriage"));
-        carriageServo.setScaleRange(0.5, 0.3);
+        carriageServo.setScaleRange(0.6, 0.3);
         carriage = new Linkage(
                 DukConstants.HARDWARE.CARRIAGE_RET_ANGLE,
                 DukConstants.HARDWARE.CARRIAGE_EXT_ANGLE,
@@ -102,18 +102,18 @@ public class SubmersibleIntake implements CachedSubsystem {
     }
 
     public boolean canTransfer() {
-        return delayedState == STATE.TRANSFER;
+        return delayedState == STATE.TRANSFER && shuttle.delayedState == Shuttle.STATE.TRANSFER && shuttle.hasElement;
     }
 
     public void extendoMovement() {
         double timeOffset = 0.75 * shuttle.delayedState.pitch * (1 - 0.5 * getState().extendoPosition);
         TimeManager.hookFuture(timeOffset, tasks.extendoTask);
-        timeOffset += 0.5;
-        TimeManager.hookFuture(timeOffset, tasks.shuttleTask);
         TimeManager.hookFuture(timeOffset + Math.max(
                 Math.abs(delayedState.extendoPosition - state.extendoPosition) * 0.5,
                 Math.abs(delayedState.carriagePosition - state.carriagePosition) * 0.2
         ), tasks.delayedStateTask);
+        timeOffset += 0.5;
+        TimeManager.hookFuture(timeOffset, tasks.shuttleTask);
     }
 
     public STATE getState() {

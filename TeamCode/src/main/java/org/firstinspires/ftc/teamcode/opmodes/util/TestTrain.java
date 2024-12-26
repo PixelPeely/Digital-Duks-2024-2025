@@ -32,18 +32,29 @@ import org.firstinspires.ftc.teamcode.util.Logger;
 @Config
 @TeleOp
 public class TestTrain extends DukOpMode {
-//    C_Servo linkageL;
+//    C_Servo linkageL, pivotL, pivotR;
 //    public static double pos;
 //    @Override
 //    public void init() {
 //        linkageL = new C_Servo(hardwareMap.get(Servo.class, "shuttlePitch"));
+//        pivotL = new C_Servo(hardwareMap.get(Servo.class, "pivotL"));
+//        pivotR = new C_Servo(hardwareMap.get(Servo.class, "pivotR"));
+//        pivotL.setScaleRange(0.9, 0.05);
+//        pivotR.setScaleRange(0.1, 0.95);
+//        //linkage =  new C_Servo(hardwareMap.get(Servo.class, "carriage"));
 //        linkageL.setScaleRange(1, 0);
 //    }
 //
 //    @Override
 //    public void loop() {
-//        linkageL.setPosition(pos);
-//        linkageL.dispatchCache();
+//        //linkageL.setPosition(pos);
+//        pivotL.setPosition(pos);
+//        pivotR.setPosition(pos);
+//        //linkage.setPosition(pos);
+//        pivotL.dispatchCache();
+//        pivotR.dispatchCache();
+//        //linkageL.dispatchCache();
+//        //linkage.dispatchCache();
 //    }
     public static Lift.STATE liftState = Lift.STATE.DOWN;
     public static SubmersibleIntake.STATE intakeState = SubmersibleIntake.STATE.DROP;

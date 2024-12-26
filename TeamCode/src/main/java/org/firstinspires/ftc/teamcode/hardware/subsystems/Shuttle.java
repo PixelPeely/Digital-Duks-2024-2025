@@ -20,16 +20,17 @@ public class Shuttle implements CachedSubsystem {
 
     private STATE state = STATE.DROP;
     public STATE delayedState = state;
-    private double rollAngle;
+    public boolean hasElement;
 
     public enum STATE {
         CARRY(0.5, 0, true),
         DROP(0.5, 0.8, true),
         SLIDE(0.5, 0, false),
-        SCOUT(0.5, 0.6, false),
+        SCOUT(0.5, 0.7, false),
         TRANSFER(0.5, 0, true),
-        PICKUP(-1, 0.8, true),
-        PICKUP_CHECK(-1, 0.6, true),
+        DEPLOYED(-1, 1, false),
+        PICKUP(-1, -1, true),
+        PICKUP_CHECK(0.5, 0.7, true)
         ;
 
         public final double roll, pitch;
@@ -45,16 +46,18 @@ public class Shuttle implements CachedSubsystem {
         tasks = new InternalTaskInstances.ShuttleTasks(this);
 
         C_Servo clawServo = new C_Servo(hardwareMap.tryGet(Servo.class, "shuttleClaw"));
-        clawServo.setScaleRange(0.45, 0.65);
-        claw = new Claw(clawServo);
+        clawServo.setScaleRange(0.35, 0.65);
+        claw = new Claw(clawServo, 0.45, 1);
         claw.setState(state.closed);
 
         roll = new C_Servo(hardwareMap.tryGet(Servo.class, "shuttleRoll"));
         roll.setScaleRange(0, 1);
+        roll.dispatchCache();
         roll.setPosition(state.roll);
 
         pitch = new C_Servo(hardwareMap.tryGet(Servo.class, "shuttlePitch"));
-        pitch.setScaleRange(0.95, 0);
+        pitch.setScaleRange(0.95, 0.2);
+        pitch.dispatchCache();
         pitch.setPosition(state.pitch);
     }
 
@@ -62,23 +65,34 @@ public class Shuttle implements CachedSubsystem {
         if (state == _state) return;
         tasks.cancelAll();
         delayedState = state;
-        TimeManager.hookFuture(Math.abs(state.pitch - _state.pitch) * 0.5, tasks.delayedStateTask);
         state = _state;
 
-        if (_state == STATE.PICKUP) {
-            claw.setState(false);
-            double timeOffset = 0.5;
-            TimeManager.hookFuture(timeOffset, tasks.pitchTask);
-            timeOffset += 0.75;
-            TimeManager.hookFuture(timeOffset, tasks.pickupTask);
-            timeOffset += 0.25;
-            TimeManager.hookFuture(timeOffset, tasks.pickupCheckTask);
-        } else {
-            if (_state != STATE.PICKUP_CHECK)
+        if (!state.closed) hasElement = false;
+
+        double offset = 0;
+        switch (_state) {
+            case DEPLOYED:
+                claw.setState(false);
+                claw.setPosition(0);
+                offset = 0.5;
+                TimeManager.hookFuture(offset, tasks.pitchTask);
+                break;
+            case PICKUP:
+                claw.setState(_state.closed);
+                hasElement = true;
+                offset = 0.5;
+                TimeManager.hookFuture(offset, tasks.pickupCheckTask);
+                break;
+            default:
+                //if (_state != STATE.PICKUP_CHECK)
                 roll.setPosition(_state.roll);
-            pitch.setPosition(_state.pitch);
-            claw.setState(_state.closed);
+                pitch.setPosition(_state.pitch);
+                claw.setState(_state.closed);
+                break;
         }
+
+        System.out.println("Hooked " + _state.name() + " for a time of " + (offset + Math.abs(delayedState.pitch - _state.pitch)));
+        TimeManager.hookFuture(offset + Math.abs(delayedState.pitch - _state.pitch) * 1.2, tasks.delayedStateTask);
     }
 
     public STATE getState() {
@@ -115,6 +129,7 @@ public class Shuttle implements CachedSubsystem {
         loggingBuffer.push("Pitch", pitch.getPosition());
         loggingBuffer.push("State", state);
         loggingBuffer.push("Delayed State", delayedState);
+        loggingBuffer.push("Has Element", hasElement);
         loggingBuffer.dispatch();
     }
 

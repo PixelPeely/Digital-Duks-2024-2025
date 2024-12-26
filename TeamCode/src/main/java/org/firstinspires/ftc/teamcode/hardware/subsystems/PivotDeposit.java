@@ -49,6 +49,7 @@ public class PivotDeposit implements CachedSubsystem {
         clawServo.setScaleRange(0.2, 0.7);
         claw = new Claw(clawServo);
         claw.setState(state.closed);
+        claw.dispatchCache();
 
         yaw = new C_Servo(hardwareMap.tryGet(Servo.class, "depositYaw"));
         yaw.setScaleRange(0, 1);

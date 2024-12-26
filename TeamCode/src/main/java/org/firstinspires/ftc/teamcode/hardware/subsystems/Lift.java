@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.hardware.CachedSubsystem;
+import org.firstinspires.ftc.teamcode.hardware.DukHardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.assemblies.HardLink;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_DcMotor;
 import org.firstinspires.ftc.teamcode.hardware.wrappers.C_TelemetryLoggingBuffer;
@@ -28,6 +29,7 @@ public class Lift implements CachedSubsystem {
 
     public enum STATE {
         DOWN(0, PivotDeposit.STATE.DOWN),
+        TRANSFER_PRIME(0.4, PivotDeposit.STATE.TRANSFER),
         TRANSFER(0, PivotDeposit.STATE.TRANSFER),
         LOW_SPECIMEN(0.1, PivotDeposit.STATE.SPECIMEN_DOWN),
         HIGH_SPECIMEN(0.4, PivotDeposit.STATE.SPECIMEN_DOWN),
@@ -86,15 +88,18 @@ public class Lift implements CachedSubsystem {
         desiredState = _state;
         if (desiredState.position < STATE.EXTENDO_CLEAR.position && !extendoRetracted) return;
 
-        if (state == _state) return;
+        System.out.println("Desired pos " + _state.position + " current target " + DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PIDF.target);
+        if (state == _state && DukConstants.AUTOMATED_CONTROLLER_PARAMS.LIFT_PIDF.target == _state.position) return;
         state = _state;
         tasks.cancelAll();
+        System.out.println(_state.position);
         setLiftPosition(_state.position);
 
         pivotDeposit.claw.setState(state.pivotState.closed);
         pivotDeposit.yaw.setPosition(state.pivotState.yaw);
         TimeManager.hookTick(tasks.setPivotState);
 
+        if (state == STATE.TRANSFER_PRIME) TimeManager.hookTick(tasks.transferPrime);
         if (state == STATE.TRANSFER) TimeManager.hookTick(tasks.requestTransfer);
     }
 
@@ -118,6 +123,10 @@ public class Lift implements CachedSubsystem {
             setState(STATE.EXTENDO_CLEAR);
             desiredState = currentState;
         }
+    }
+
+    public boolean getExtendoRetracted() {
+        return extendoRetracted;
     }
 
     public void resetEncoders() {

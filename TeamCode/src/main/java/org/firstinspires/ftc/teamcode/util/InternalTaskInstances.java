@@ -18,6 +18,7 @@ public class InternalTaskInstances {
 
             intakeRelease = t -> {
                 instance.submersibleIntake.shuttle.claw.setState(false);
+                instance.submersibleIntake.shuttle.hasElement = false;
                 return true;
             };
         }
@@ -72,7 +73,6 @@ public class InternalTaskInstances {
     }
 
     public static class ShuttleTasks {
-        public final Predicate<Double> pickupTask;
         public final Predicate<Double> pickupCheckTask;
         public final Predicate<Double> pitchTask;
         public final Predicate<Double> delayedStateTask;
@@ -81,11 +81,6 @@ public class InternalTaskInstances {
 
         public ShuttleTasks(Shuttle _shuttle) {
             shuttle = _shuttle;
-
-            pickupTask = t -> {
-                shuttle.claw.setState(Shuttle.STATE.PICKUP.closed);
-                return true;
-            };
 
             pickupCheckTask = t -> {
                 shuttle.setState(Shuttle.STATE.PICKUP_CHECK);
@@ -104,7 +99,7 @@ public class InternalTaskInstances {
         }
 
         public void cancelAll() {
-            TimeManager.cancelTask(pickupTask);
+            TimeManager.cancelTask(pitchTask);
             TimeManager.cancelTask(pickupCheckTask);
             TimeManager.cancelTask(delayedStateTask);
         }
@@ -112,12 +107,21 @@ public class InternalTaskInstances {
 
     public static class LiftTasks {
         public final Predicate<Double> requestTransfer;
+        public final Predicate<Double> transferPrime;
         public final Predicate<Double> setPivotState;
 
         private final Lift lift;
 
         public LiftTasks(Lift _lift) {
             lift = _lift;
+
+            transferPrime = t -> {
+                if (DukHardwareMap.InternalInteractions.extendoCanTransfer()) {
+                    lift.setState(Lift.STATE.TRANSFER);
+                    return true;
+                }
+                return false;
+            };
 
             requestTransfer = t -> {
                 if (lift.canTransfer()) {
@@ -139,6 +143,7 @@ public class InternalTaskInstances {
         public void cancelAll() {
             TimeManager.cancelTask(requestTransfer);
             TimeManager.cancelTask(setPivotState);
+            TimeManager.cancelTask(transferPrime);
         }
     }
 }

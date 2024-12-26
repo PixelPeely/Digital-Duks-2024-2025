@@ -55,11 +55,18 @@ public class DirectionlessDrive extends DukOpMode {
         if (gamepadExt.onAPressed()) {
             switch (state) {
                 case SCOUT:
-                    _hardwareMap.submersibleIntake.shuttle.setState(
-                            _hardwareMap.submersibleIntake.shuttle.getState() == Shuttle.STATE.PICKUP ?
-                                    Shuttle.STATE.SCOUT : Shuttle.STATE.PICKUP);
+                     switch (_hardwareMap.submersibleIntake.shuttle.getState()) {
+                         case SCOUT:
+                         case PICKUP_CHECK:
+                             _hardwareMap.submersibleIntake.shuttle.setState(Shuttle.STATE.DEPLOYED);
+                             break;
+                         case DEPLOYED:
+                             _hardwareMap.submersibleIntake.shuttle.setState(Shuttle.STATE.PICKUP);
+                             break;
+                     }
                     break;
                 default:
+
                     _hardwareMap.submersibleIntake.setState(SubmersibleIntake.STATE.SCOUT);
                     break;
             }
@@ -80,7 +87,7 @@ public class DirectionlessDrive extends DukOpMode {
             _hardwareMap.submersibleIntake.setState(SubmersibleIntake.STATE.TRANSFER);
 
         double rollDelta = (gamepad.dpad_right ? 0 : 0.01) - (gamepad.dpad_left ? 0 : 0.01);
-        if (rollDelta > 0) {
+        if (Math.abs(rollDelta) > 0) {
             _hardwareMap.submersibleIntake.shuttle.roll.setPosition(
                     DukUtilities.clamp(_hardwareMap.submersibleIntake.shuttle.roll.getPosition() + rollDelta, 1, 0));
             _hardwareMap.submersibleIntake.shuttle.claw.closed = false;
@@ -101,7 +108,7 @@ public class DirectionlessDrive extends DukOpMode {
             _hardwareMap.lift.setState(Lift.STATE.HIGH_SPECIMEN);
 
         if (gamepadExt.onYPressed())
-            _hardwareMap.lift.setState(Lift.STATE.TRANSFER);
+            _hardwareMap.lift.setState(Lift.STATE.TRANSFER_PRIME);
 
         if (gamepadExt.onAPressed())
             _hardwareMap.lift.pivotDeposit.claw.toggle();
@@ -110,12 +117,10 @@ public class DirectionlessDrive extends DukOpMode {
     }
 
     private void checkSafetySwitch() {
-//        if (gamepad2Ext.onYPressed()) {
-//            _hardwareMap.driveTrain.pursueHeading = blind1;
-//            blind1 = !blind1;
-//        }
-//        if (gamepad1Ext.onXPressed())
-//            blind2 = !blind2;
+        if (gamepad1Ext.onXPressed()) {
+            _hardwareMap.driveTrain.pursueHeading = blind1;
+            blind1 = !blind1;
+        }
     }
 
     private void driveLog() {
@@ -132,13 +137,12 @@ public class DirectionlessDrive extends DukOpMode {
     @Override
     public void preTick() {
         checkSafetySwitch();
-        controlDrivetrain(gamepad1, gamepad1Ext);
+        if (blind1)
+            controlDrivetrainBlind(gamepad1, gamepad1Ext);
+        else
+            controlDrivetrain(gamepad1, gamepad1Ext);
         controlSubmersibleIntake(gamepad1, gamepad1Ext);
         controlLift(gamepad2, gamepad2Ext);
-//        if (blind1) driver1ControlsBlind();
-//        else driver1Controls();
-//        if (blind2) driver2ControlsBlind();
-//        else driver2Controls();
         driveLog();
     }
 

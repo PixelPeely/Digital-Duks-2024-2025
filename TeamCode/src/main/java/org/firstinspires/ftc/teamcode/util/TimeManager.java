@@ -13,14 +13,21 @@ public class TimeManager {
 
     private static List<Predicate<Double>> tasks = new ArrayList<>();
     private static List<Predicate<Double>> recentTasks = new ArrayList<>();
+    private static List<Predicate<Double>> purgedTasks = new ArrayList<>();
 
     //Called at the end of every tick
     public static void onTick(double time) {
         if (currentTime != -1) deltaTime = time - currentTime;
         else initTime = time;
         currentTime = time;
+
         tasks.addAll(recentTasks);
+        purgedTasks.forEach(toPurge -> {
+            tasks.removeIf(t -> t.equals(toPurge));
+        });
         recentTasks.clear();
+        purgedTasks.clear();
+
         tasks.removeIf(task -> task.test(getTime(false)));
     }
 
@@ -56,7 +63,8 @@ public class TimeManager {
     }
 
     public static void cancelTask(Predicate<Double> task) {
-        tasks.removeIf(t -> t.equals(task));
+        if (tasks.contains(task))
+            purgedTasks.add(task);
         recentTasks.removeIf(t -> t.equals(task));
     }
 

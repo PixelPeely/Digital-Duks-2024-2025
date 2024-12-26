@@ -18,6 +18,7 @@ public class AutoPointTask implements AutoTask {
 
     @Override
     public void initialize() {
+        System.out.println("target x: " + target.pos.getX() + ", y: " + target.pos.getY());
         _hardwareMap.driveTrain.targetPose = target;
         _hardwareMap.driveTrain.pursuePosition = _hardwareMap.driveTrain.pursueHeading = true;
     }

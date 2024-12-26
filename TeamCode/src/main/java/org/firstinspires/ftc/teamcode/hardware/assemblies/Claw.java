@@ -7,13 +7,29 @@ public class Claw implements CachedPeripheral {
     private final C_Servo servo;
     public boolean closed;
 
+    private final double openPos;
+    private final double closedPos;
+
     public Claw(C_Servo _servo) {
+        openPos = 0;
+        closedPos = 1;
+        servo = _servo;
+    }
+
+    public Claw(C_Servo _servo, double _openPos, double _closedPos) {
+        openPos = _openPos;
+        closedPos = _closedPos;
         servo = _servo;
     }
 
     public void setState(boolean _closed) {
         closed = _closed;
-        servo.setPosition(_closed ? 1 : 0);
+        servo.setPosition(_closed ? closedPos : openPos);
+        dispatchCache();
+    }
+
+    public void setPosition(double position) {
+        servo.setPosition(position);
     }
 
     public void toggle() {

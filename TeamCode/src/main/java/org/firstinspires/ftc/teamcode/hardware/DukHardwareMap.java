@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.hardware.assemblies.HardLink;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Clutch;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.hardware.subsystems.DuplexIMU;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Lift;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.PoseEstimator;
 import org.firstinspires.ftc.teamcode.hardware.subsystems.SubmersibleIntake;
@@ -24,6 +25,7 @@ public class DukHardwareMap {
     public final Clutch clutch;
     public final Lift lift;
     public final SubmersibleIntake submersibleIntake;
+    public final DuplexIMU duplexIMU;
 
     private static DukHardwareMap instance;
 
@@ -42,6 +44,7 @@ public class DukHardwareMap {
         clutch = new Clutch(hardwareMap);
         lift = new Lift(hardwareMap);
         submersibleIntake = new SubmersibleIntake(hardwareMap);
+        duplexIMU = new DuplexIMU(hardwareMap);
 
         allHubs = hardwareMap.getAll(LynxModule.class);
         AutoTask.Base._hardwareMap = this;
@@ -55,22 +58,20 @@ public class DukHardwareMap {
             return instance.lift.winch.getAveragePower();
         }
 
-        public static Lift.STATE getLiftState() {
-            return instance.lift.getState();
-        }
-
-        public static void setLiftState(Lift.STATE state) {
-            instance.lift.setState(state);
-        }
-
         public static void extendoClearanceUpdate(boolean retracted) {
             instance.lift.extendoClearanceUpdate(retracted);
+        }
+
+        public static boolean extendoCanTransfer() {
+            return instance.submersibleIntake.canTransfer();
         }
 
         public static void attemptTransfer() {
             if (!instance.lift.canTransfer() || !instance.submersibleIntake.canTransfer()) return;
             instance.lift.pivotDeposit.claw.setState(true);
-            TimeManager.hookFuture(0.5, InternalTaskInstances.InternalInteractions.intakeRelease);
+            instance.lift.pivotDeposit.claw.dispatchCache();
+            System.out.println("closed else retard");
+            TimeManager.hookFuture(0.7, InternalTaskInstances.InternalInteractions.intakeRelease);
         }
     }
 
@@ -99,18 +100,21 @@ public class DukHardwareMap {
         driveTrain.dispatchAllCaches();
         lift.dispatchAllCaches();
         submersibleIntake.dispatchAllCaches();
+        duplexIMU.dispatchAllCaches();
     }
 
     public void refreshAll() {
         driveTrain.refreshAllCaches();
         lift.refreshAllCaches();
         submersibleIntake.refreshAllCaches();
+        duplexIMU.refreshAllCaches();
     }
 
     public void pushTelemetryAll() {
         driveTrain.pushTelemetry();
         lift.pushTelemetry();
         submersibleIntake.pushTelemetry();
+        duplexIMU.pushTelemetry();
     }
 
     public void allowDispatch(boolean state) {

@@ -90,7 +90,7 @@ public class PoseEstimator implements CachedSubsystem {
         pose = new Pose(_pose);
         Pose wheels = new Pose(_pose);
         wheels.spaceTransform(pose.getH(), DukConstants.HARDWARE.ODOMETER_CENTER, false);
-        //odometerWheels.pose = wheels;
+        deadWheelLocalizer.pose = wheels;
     }
 
     public Pose getPose() {return pose;}

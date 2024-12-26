@@ -32,10 +32,12 @@ public class DuplexIMU implements CachedSubsystem {
         imuHub.axesReference = imuExp.axesReference = DukConstants.ORIENTATION.AXES_REFERENCE;
         imuHub.axesOrder = imuExp.axesOrder = DukConstants.ORIENTATION.AXES_ORDER;
         imuHub.angleUnit = imuExp.angleUnit = DukConstants.ORIENTATION.ANGLE_UNIT;
-        imuHub.invertRefresh = true;
 
         imuHub.toRefresh[0] = true;
         imuExp.toRefresh[0] = true;
+
+        imuHub.invertRefresh = true;
+        imuExp.invertRefresh = true;
 
         dispatchAllCaches();
     }
